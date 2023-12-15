@@ -22,14 +22,67 @@ class User extends Database {
         }
     }
 
+    async authLogin(emailUser, password) {
+        try {
+            const connection = await this.connect();
+
+            // Check if the email exists
+            const isEmailExists = await this.isExistsEmail(emailUser);
+
+            if (!isEmailExists) {
+                return { success: false, error: 'Account does not exist' };
+            }
+
+            const [userData] = await connection.query("SELECT * FROM users WHERE emailUser = ?", [emailUser]);
+
+            const hashedPassword = userData[0].password;
+
+            const isPasswordMatch = await bcrypt.compare(password, hashedPassword);
+
+            if (!isPasswordMatch) {
+                return { success: false, error: 'Invalid password' };
+            }
+
+            return { success: true, userData: userData[0].idUser };
+        } catch (error) {
+            console.error("Error authenticating user: ", error.message);
+            throw error;
+        }
+    }
+
+    async isExistsEmail(emailUser) {
+        try {
+            const connection = await this.connect();
+            const [emailExists] = await connection.query("SELECT COUNT(emailUser) as count FROM users WHERE emailUser = ?", [emailUser]);
+            if (emailExists[0].count > 0) {
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error("Error checking email existence: ", error.message);
+            throw error;
+        }
+    }
+
     async createUser(nameUser, dob, emailUser, phoneNumber, password) {
         try {
-            const hashedPassword = await bcrypt.hash(password, 10);
             const connection = await this.connect();
+
+            const [countEmails] = await connection.query("SELECT COUNT(*) AS count FROM users WHERE emailUser = ?", [emailUser]);
+            if (countEmails[0].count > 0) {
+                return { success: false, error: 'Email already exists...' };
+            }
+
+            const hashedPassword = await bcrypt.hash(password, 10);
             const query = "INSERT INTO users (idUser, nameUser, dob, emailUser, phoneNumber, password) VALUES (null, ?, ?, ?, ?, ?)";
             const [results] = await connection.query(query, [nameUser, dob, emailUser, phoneNumber, hashedPassword]);
             connection.end();
-            return { success: true };
+            if (results.affectedRows > 0) {
+                return { success: true, message: "Successful" };
+            } else {
+                return { success: false, message: "Failed to create user..." };
+            }
+
         } catch (error) {
             console.error("Cannot create new user: ", error.message);
             throw error;
@@ -42,11 +95,13 @@ class User extends Database {
             const query = "UPDATE users SET nameUser = ?, dob = ?, emailUser = ?, phoneNumber = ? WHERE idUser = ?";
             const [results] = await connection.query(query, [nameUser, dob, emailUser, phoneNumber, idUser]);
             connection.end();
+
             if (results.affectedRows > 0) {
-                return { success: true };
+                return { success: true, message: "Successful" };
             } else {
-                return { success: false, message: "User not found or no changes made" };
+                return { success: false, message: "Failed to update user..." };
             }
+
         } catch (error) {
             console.error("Cannot update user: ", error.message);
             throw error;
@@ -66,17 +121,17 @@ class User extends Database {
                 const hashedPassword = await bcrypt.hash(newPassword, 10);
                 const queryUpdatePassword = "UPDATE users SET password = ? WHERE idUser = ?";
                 const [results] = await connection.query(queryUpdatePassword, [hashedPassword, idUser]);
+                connection.end();
 
                 if (results.affectedRows > 0) {
-                    connection.end();
-                    return { success: true };
+                    return { success: true, message: "Successful" };
                 } else {
-                    connection.end();
-                    return { success: false, message: "Unable to update new password" };
+                    return { success: false, message: "Failed to update password..." };
                 }
+
             } else {
                 connection.end();
-                return { success: false, message: "Current password does not match" };
+                return false;
             }
         } catch (error) {
             console.error("Cannot update password: ", error.message);

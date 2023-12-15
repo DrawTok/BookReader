@@ -1,53 +1,68 @@
 const User = require("../models/User");
 const express = require('express');
-const bodyParser = require('body-parser');
 const router = express.Router();
 
-router.use(bodyParser.urlencoded({ extended: true }));
-router.use(bodyParser.json());
+router.use(express.json());
 
+const handleResponse = (res, result) => {
+    const status = result.success ? 200 : 500;
+    res.status(status).json({ result });
+};
 
-router.get('/:idUser', async (req, res) => {
+router.get('/getInfoUser/:idUser', async (req, res) => {
     try {
         const idUser = req.params.idUser;
         if (!idUser) {
-            return res.status(400).json({ error: 'Thiếu tham số idUser.' });
+            return res.status(400).json({ error: 'Missing input parameters...' });
         }
         const user = new User();
         const infoUser = await user.getInfo(idUser);
-        if (!infoUser) {
-            return res.status(404).json({ error: 'Người dùng không tồn tại.' });
+        if (infoUser.success) {
+            res.json(infoUser);
+        } else {
+            res.status(404).json({ error: infoUser.message });
         }
-        res.json({ infoUser });
     } catch (error) {
-        console.error('Lỗi khi lấy thông tin người dùng:', error);
-        res.status(500).json({ error: 'Đã xảy ra lỗi khi xử lý yêu cầu.' });
+        console.error('Error while retrieving user information:', error);
+        res.status(500).json({ error: 'An error occurred while processing the request.' });
     }
 });
 
-router.post('/:nameUser/:dob/:emailUser/:phoneNumber/:password', async (req, res) => {
+router.post('/updateUser', async (req, res) => {
     try {
-        const nameUser = req.params.nameUser;
-        const dob = req.params.dob;
-        const emailUser = req.params.emailUser;
-        const phoneNumber = req.params.phoneNumber;
-        const password = req.params.password;
+        const { idUser, nameUser, dob, emailUser, phoneNumber } = req.body;
 
-        if (!nameUser || !dob || !emailUser || !phoneNumber || !password) {
-            return res.status(400).json({ error: 'Thiếu tham số đầu vào...' });
+        if (!idUser || !nameUser || !dob || !emailUser || !phoneNumber) {
+            return res.status(400).json({ error: 'Missing input parameters...' });
         }
-        const user = new User();
-        const infoUser = await user.getInfo(idUser);
-        if (!infoUser) {
-            return res.status(404).json({ error: 'Người dùng không tồn tại.' });
-        }
-        res.json({ infoUser });
+        const newUser = new User();
+        const result = await newUser.updateUser(idUser, nameUser, dob, emailUser, phoneNumber);
+
+        handleResponse(res, result);
+
     } catch (error) {
-        console.error('Lỗi khi lấy thông tin người dùng:', error);
-        res.status(500).json({ error: 'Đã xảy ra lỗi khi xử lý yêu cầu.' });
+        console.error('Error while updating user:', error);
+        res.status(500).json({ error: 'An error occurred while processing the request.' });
     }
 });
 
+router.post('/updatePassword', async (req, res) => {
+    try {
+        const { idUser, curPassword, newPassword } = req.body;
+
+        if (!idUser || !curPassword || !newPassword) {
+            return res.status(400).json({ error: 'Missing input parameters...' });
+        }
+        const newUser = new User();
+        const result = await newUser.updatePassword(idUser, curPassword, newPassword);
+
+        handleResponse(res, result);
+
+    } catch (error) {
+        console.error('Error while updating password:', error);
+        res.status(500).json({ error: 'An error occurred while processing the request.' });
+    }
+});
 
 
 module.exports = router;
