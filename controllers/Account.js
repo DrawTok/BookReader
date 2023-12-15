@@ -1,19 +1,20 @@
 const User = require("../models/User");
 const express = require('express');
 const bodyParser = require('body-parser');
-const app = express();
+const router = express.Router();
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+router.use(bodyParser.urlencoded({ extended: true }));
+router.use(bodyParser.json());
 
 
-app.get('/bookReader/controllers/Account.js', async (req, res) => {
+router.get('/:idUser', async (req, res) => {
     try {
-        const idUser = 1;
+        const idUser = req.params.idUser;
         if (!idUser) {
             return res.status(400).json({ error: 'Thiếu tham số idUser.' });
         }
-        const infoUser = await User.findById(idUser);
+        const user = new User();
+        const infoUser = await user.getInfo(idUser);
         if (!infoUser) {
             return res.status(404).json({ error: 'Người dùng không tồn tại.' });
         }
@@ -22,4 +23,31 @@ app.get('/bookReader/controllers/Account.js', async (req, res) => {
         console.error('Lỗi khi lấy thông tin người dùng:', error);
         res.status(500).json({ error: 'Đã xảy ra lỗi khi xử lý yêu cầu.' });
     }
-})
+});
+
+router.post('/:nameUser/:dob/:emailUser/:phoneNumber/:password', async (req, res) => {
+    try {
+        const nameUser = req.params.nameUser;
+        const dob = req.params.dob;
+        const emailUser = req.params.emailUser;
+        const phoneNumber = req.params.phoneNumber;
+        const password = req.params.password;
+
+        if (!nameUser || !dob || !emailUser || !phoneNumber || !password) {
+            return res.status(400).json({ error: 'Thiếu tham số đầu vào...' });
+        }
+        const user = new User();
+        const infoUser = await user.getInfo(idUser);
+        if (!infoUser) {
+            return res.status(404).json({ error: 'Người dùng không tồn tại.' });
+        }
+        res.json({ infoUser });
+    } catch (error) {
+        console.error('Lỗi khi lấy thông tin người dùng:', error);
+        res.status(500).json({ error: 'Đã xảy ra lỗi khi xử lý yêu cầu.' });
+    }
+});
+
+
+
+module.exports = router;
