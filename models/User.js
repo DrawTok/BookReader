@@ -10,7 +10,7 @@ class User extends Database {
         try {
             connection = await this.connect();
             const query =
-                "SELECT email, gullName, birthDay, role FROM users WHERE idUser = ?";
+                "SELECT email, fullName, birthDay, role FROM users WHERE idUser = ?";
             const [results] = await connection.query(query, [idUser]);
 
             if (results.length > 0)
