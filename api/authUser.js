@@ -29,7 +29,7 @@ router.post('/authLogin', async (req, res) => {
     }
 
     const user = new User();
-    const result = await user.authLogin(emailUser, password);
+    const result = await user.authLogin(email, password);
 
     res.status(result.success ? 200 : 401).json(result);
 });
