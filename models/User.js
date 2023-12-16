@@ -142,16 +142,6 @@ class User extends Database {
         try {
             connection = await this.connect();
 
-            const query =
-                "UPDATE users SET fullName = ?, birthDay = ?, email = ?, phoneNumber = ? WHERE idUser = ?";
-            const [results] = await connection.query(query, [
-                email,
-                fullName,
-                birthDay,
-                role,
-                idUser,
-            ]);
-
             const query = "UPDATE users SET email = ?, fullName = ?, birthDay = ?, role = ? WHERE idUser = ?";
             const [results] = await connection.query(query, [email, fullName, birthDay, role, idUser]);
 
