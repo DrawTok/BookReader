@@ -9,8 +9,8 @@ class User extends Database {
         let connection;
         try {
             connection = await this.connect();
-            const query =
-                "SELECT email, fullName, birthDay, role FROM users WHERE idUser = ?";
+          
+            const query = "SELECT email, fullName, birthDay, role FROM users WHERE idUser = ?";
             const [results] = await connection.query(query, [idUser]);
 
             if (results.length > 0)
@@ -38,10 +38,7 @@ class User extends Database {
                 return { success: false, error: "Account does not exist" };
             }
 
-            const [userData] = await connection.query(
-                "SELECT * FROM users WHERE email = ?",
-                [email]
-            );
+            const [userData] = await connection.query("SELECT * FROM users WHERE email = ?", [email]);
 
             const hashedPassword = userData[0].password;
 
@@ -56,7 +53,10 @@ class User extends Database {
                 return { success: false, error: "Invalid password" };
             }
 
-            return { success: true, userData: userData[0] };
+            const userDataWithoutPassword = { ...userData[0] };
+            delete userDataWithoutPassword.password;
+
+            return { success: true, userData: userDataWithoutPassword };
         } catch (error) {
             console.error("Error authenticating user: ", error.message);
             throw error;
@@ -71,10 +71,12 @@ class User extends Database {
         let connection;
         try {
             connection = await this.connect();
+
             const [emailExists] = await connection.query(
                 "SELECT COUNT(email) as count FROM users WHERE email = ?",
                 [email]
             );
+
 
             if (emailExists[0].count > 0) {
                 return true;
@@ -99,6 +101,7 @@ class User extends Database {
                 "SELECT COUNT(*) AS count FROM users WHERE email = ?",
                 [email]
             );
+          
             if (countEmails[0].count > 0) {
                 return { success: false, error: "Email already exists..." };
             }
@@ -117,6 +120,7 @@ class User extends Database {
                 hashedPassword,
                 role,
             ]);
+
 
             if (results.affectedRows > 0) {
                 return { success: true, message: "Successful" };
@@ -137,6 +141,7 @@ class User extends Database {
         let connection;
         try {
             connection = await this.connect();
+
             const query =
                 "UPDATE users SET fullName = ?, birthDay = ?, email = ?, phoneNumber = ? WHERE idUser = ?";
             const [results] = await connection.query(query, [
@@ -146,6 +151,9 @@ class User extends Database {
                 role,
                 idUser,
             ]);
+
+            const query = "UPDATE users SET email = ?, fullName = ?, birthDay = ?, role = ? WHERE idUser = ?";
+            const [results] = await connection.query(query, [email, fullName, birthDay, role, idUser]);
 
             if (results.affectedRows > 0) {
                 return { success: true, message: "Successful" };
