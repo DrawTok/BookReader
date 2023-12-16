@@ -28,7 +28,7 @@ router.get('/getInfoUser/:idUser', async (req, res) => {
     }
 });
 
-router.post('/updateUser', async (req, res) => {
+router.post('/updateInfoUser', async (req, res) => {
     try {
         const { idUser, nameUser, dob, emailUser, phoneNumber } = req.body;
 
