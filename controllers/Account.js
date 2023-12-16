@@ -30,13 +30,13 @@ router.get('/getInfoUser/:idUser', async (req, res) => {
 
 router.post('/updateInfoUser', async (req, res) => {
     try {
-        const { idUser, nameUser, dob, emailUser, phoneNumber } = req.body;
+        const { idUser, email, fullName, birthDay, role } = req.body;
 
-        if (!idUser || !nameUser || !dob || !emailUser || !phoneNumber) {
+        if (!idUser || !email || !fullName || !birthDay || !role) {
             return res.status(400).json({ error: 'Missing input parameters...' });
         }
         const newUser = new User();
-        const result = await newUser.updateUser(idUser, nameUser, dob, emailUser, phoneNumber);
+        const result = await newUser.updateUser(idUser, email, fullName, birthDay, role);
 
         handleResponse(res, result);
 

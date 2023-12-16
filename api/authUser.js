@@ -6,13 +6,13 @@ router.use(express.json());
 
 router.post('/createUser', async (req, res) => {
     try {
-        const { nameUser, dob, emailUser, phoneNumber, password } = req.body;
+        const { email, fullName, birthDay, password, role } = req.body;
 
-        if (!nameUser || !dob || !emailUser || !phoneNumber || !password) {
+        if (!email || !fullName || !birthDay || !role || !password) {
             return res.status(400).json({ success: false, error: 'Missing input parameters...' });
         }
         const newUser = new User();
-        const result = await newUser.createUser(nameUser, dob, emailUser, phoneNumber, password);
+        const result = await newUser.createUser(email, fullName, birthDay, password, role);
 
         res.status(result.success ? 201 : 500).json({ result });
 
@@ -23,8 +23,8 @@ router.post('/createUser', async (req, res) => {
 });
 
 router.post('/authLogin', async (req, res) => {
-    const { emailUser, password } = req.body;
-    if (!emailUser || !password) {
+    const { email, password } = req.body;
+    if (!email || !password) {
         return res.status(400).json({ success: false, error: 'Missing input parameters...' });
     }
 

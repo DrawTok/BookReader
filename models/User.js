@@ -10,7 +10,7 @@ class User extends Database {
         let connection;
         try {
             connection = await this.connect();
-            const query = "SELECT nameUser, dob, emailUser, phoneNumber FROM users WHERE idUser = ?";
+            const query = "SELECT email, gullName, birthDay, role FROM users WHERE idUser = ?";
             const [results] = await connection.query(query, [idUser]);
 
             if (results.length > 0)
@@ -27,19 +27,19 @@ class User extends Database {
         }
     }
 
-    async authLogin(emailUser, password) {
+    async authLogin(email, password) {
         let connection;
         try {
             connection = await this.connect();
 
             // Check if the email exists
-            const isEmailExists = await this.isExistsEmail(emailUser);
+            const isEmailExists = await this.isExistsEmail(email);
 
             if (!isEmailExists) {
                 return { success: false, error: 'Account does not exist' };
             }
 
-            const [userData] = await connection.query("SELECT * FROM users WHERE emailUser = ?", [emailUser]);
+            const [userData] = await connection.query("SELECT * FROM users WHERE emailUser = ?", [email]);
 
             const hashedPassword = userData[0].password;
 
@@ -51,7 +51,7 @@ class User extends Database {
                 return { success: false, error: 'Invalid password' };
             }
 
-            return { success: true, userData: { idUser: userData[0].idUser } };
+            return { success: true, userData: userData[0] };
         } catch (error) {
             console.error("Error authenticating user: ", error.message);
             throw error;
@@ -62,11 +62,11 @@ class User extends Database {
         }
     }
 
-    async isExistsEmail(emailUser) {
+    async isExistsEmail(email) {
         let connection;
         try {
             connection = await this.connect();
-            const [emailExists] = await connection.query("SELECT COUNT(emailUser) as count FROM users WHERE emailUser = ?", [emailUser]);
+            const [emailExists] = await connection.query("SELECT COUNT(emailUser) as count FROM users WHERE emailUser = ?", [email]);
 
             if (emailExists[0].count > 0) {
                 return true;
@@ -82,12 +82,12 @@ class User extends Database {
         }
     }
 
-    async createUser(nameUser, dob, emailUser, phoneNumber, password) {
+    async createUser(email, fullName, birthDay, password, role) {
         let connection;
         try {
             connection = await this.connect();
 
-            const [countEmails] = await connection.query("SELECT COUNT(*) AS count FROM users WHERE emailUser = ?", [emailUser]);
+            const [countEmails] = await connection.query("SELECT COUNT(*) AS count FROM users WHERE emailUser = ?", [email]);
             if (countEmails[0].count > 0) {
                 return { success: false, error: 'Email already exists...' };
             }
@@ -95,7 +95,7 @@ class User extends Database {
             const hashedPassword = await crypto.createHash('sha256').update(password).digest('hex');
 
             const query = "INSERT INTO users (idUser, nameUser, dob, emailUser, phoneNumber, password) VALUES (null, ?, ?, ?, ?, ?)";
-            const [results] = await connection.query(query, [nameUser, dob, emailUser, phoneNumber, hashedPassword]);
+            const [results] = await connection.query(query, [email, fullName, birthDay, hashedPassword, role]);
 
             if (results.affectedRows > 0) {
                 return { success: true, message: "Successful" };
@@ -113,12 +113,12 @@ class User extends Database {
         }
     }
 
-    async updateUser(idUser, nameUser, dob, emailUser, phoneNumber) {
+    async updateUser(idUser, email, fullName, birthDay, role) {
         let connection;
         try {
             connection = await this.connect();
             const query = "UPDATE users SET nameUser = ?, dob = ?, emailUser = ?, phoneNumber = ? WHERE idUser = ?";
-            const [results] = await connection.query(query, [nameUser, dob, emailUser, phoneNumber, idUser]);
+            const [results] = await connection.query(query, [email, fullName, birthDay, role, idUser]);
 
             if (results.affectedRows > 0) {
                 return { success: true, message: "Successful" };
