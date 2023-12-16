@@ -3,10 +3,10 @@ const mysql = require("mysql2/promise");
 
 class Database {
     constructor() {
-        this.serverName = "localhost";
-        this.databaseName = "bookReader";
-        this.databaseUser = "root";
-        this.databasePassword = null;
+        this.serverName = "103.200.22.212";
+        this.databaseName = "tmquangt_book";
+        this.databaseUser = "tmquangt_book";
+        this.databasePassword = "Matkhau123";
     }
 
     async connect() {
