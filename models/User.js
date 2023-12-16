@@ -39,7 +39,7 @@ class User extends Database {
                 return { success: false, error: 'Account does not exist' };
             }
 
-            const [userData] = await connection.query("SELECT * FROM users WHERE emailUser = ?", [email]);
+            const [userData] = await connection.query("SELECT * FROM users WHERE email = ?", [email]);
 
             const hashedPassword = userData[0].password;
 
@@ -66,7 +66,7 @@ class User extends Database {
         let connection;
         try {
             connection = await this.connect();
-            const [emailExists] = await connection.query("SELECT COUNT(emailUser) as count FROM users WHERE emailUser = ?", [email]);
+            const [emailExists] = await connection.query("SELECT COUNT(email) as count FROM users WHERE email = ?", [email]);
 
             if (emailExists[0].count > 0) {
                 return true;
@@ -87,14 +87,14 @@ class User extends Database {
         try {
             connection = await this.connect();
 
-            const [countEmails] = await connection.query("SELECT COUNT(*) AS count FROM users WHERE emailUser = ?", [email]);
+            const [countEmails] = await connection.query("SELECT COUNT(*) AS count FROM users WHERE email = ?", [email]);
             if (countEmails[0].count > 0) {
                 return { success: false, error: 'Email already exists...' };
             }
 
             const hashedPassword = await crypto.createHash('sha256').update(password).digest('hex');
 
-            const query = "INSERT INTO users (idUser, nameUser, dob, emailUser, phoneNumber, password) VALUES (null, ?, ?, ?, ?, ?)";
+            const query = "INSERT INTO users (idUser, nameUser, dob, email, phoneNumber, password) VALUES (null, ?, ?, ?, ?, ?)";
             const [results] = await connection.query(query, [email, fullName, birthDay, hashedPassword, role]);
 
             if (results.affectedRows > 0) {
@@ -117,7 +117,7 @@ class User extends Database {
         let connection;
         try {
             connection = await this.connect();
-            const query = "UPDATE users SET nameUser = ?, dob = ?, emailUser = ?, phoneNumber = ? WHERE idUser = ?";
+            const query = "UPDATE users SET nameUser = ?, dob = ?, email = ?, phoneNumber = ? WHERE idUser = ?";
             const [results] = await connection.query(query, [email, fullName, birthDay, role, idUser]);
 
             if (results.affectedRows > 0) {
