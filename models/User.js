@@ -72,16 +72,9 @@ class User extends Database {
         try {
             connection = await this.connect();
 
-            const [emailExists] = await connection.query(
-                "SELECT COUNT(email) as count FROM users WHERE email = ?",
-                [email]
-            );
+            const [emailExists] = await connection.query("SELECT COUNT(email) as count FROM users WHERE email = ?", [email]);
 
-
-            if (emailExists[0].count > 0) {
-                return true;
-            }
-            return false;
+            return emailExists[0].count > 0 ? true : false
         } catch (error) {
             console.error("Error checking email existence: ", error.message);
             throw error;
@@ -97,10 +90,7 @@ class User extends Database {
         try {
             connection = await this.connect();
 
-            const [countEmails] = await connection.query(
-                "SELECT COUNT(*) AS count FROM users WHERE email = ?",
-                [email]
-            );
+            const [countEmails] = await connection.query("SELECT COUNT(*) AS count FROM users WHERE email = ?", [email]);
 
             if (countEmails[0].count > 0) {
                 return { success: false, error: "Email already exists..." };
@@ -111,8 +101,7 @@ class User extends Database {
                 .update(password)
                 .digest("hex");
 
-            const query =
-                "INSERT INTO users (email, fullName, birthDay, password, role) VALUES (?, ?, ?, ?, ?)";
+            const query = "INSERT INTO users (email, fullName, birthDay, password, role) VALUES (?, ?, ?, ?, ?)";
             const [results] = await connection.query(query, [
                 email,
                 fullName,
@@ -121,9 +110,11 @@ class User extends Database {
                 role,
             ]);
 
+            const queryGet = "SELECT * FROM users WHERE email = ?";
+            const [userData] = await connection.query(queryGet, [email]);
 
             if (results.affectedRows > 0) {
-                return { success: true, message: "Successful" };
+                return { success: true, message: "Successful", userData };
             } else {
                 return { success: false, message: "Failed to create user..." };
             }
