@@ -6,7 +6,7 @@ class AccountController {
 
     registerUser(req, res) {
         try {
-            const { email, phoneNumber, fullName, birthDay, password, rePassword, role } = req.body;
+            const { email, fullName, birthDay, password, rePassword, role } = req.body;
             if (!email || !fullName | !password || !rePassword) {
                 return res.json({
                     success: false,
@@ -23,7 +23,6 @@ class AccountController {
 
             user.createUser(
                 email,
-                phoneNumber || "NULL",
                 fullName,
                 birthDay,
                 password,

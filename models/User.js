@@ -92,7 +92,7 @@ class User extends Database {
         }
     }
 
-    async createUser(email, phoneNumber = "NULL", fullName, birthDay, password, role = "user") {
+    async createUser(email, fullName, birthDay, password, role = "user") {
         let connection;
         try {
             connection = await this.connect();
@@ -112,10 +112,9 @@ class User extends Database {
                 .digest("hex");
 
             const query =
-                "INSERT INTO users (idUser, email, phoneNumber, fullName, birthDay, password, role) VALUES (NULL, ?, ?, ?, ?, ?, ?)";
+                "INSERT INTO users (idUser, email, phoneNumber, fullName, birthDay, password, role) VALUES (NULL, ?, NULL, ?, ?, ?, ?)";
             const [results] = await connection.query(query, [
                 email,
-                phoneNumber,
                 fullName,
                 birthDay,
                 hashedPassword,
