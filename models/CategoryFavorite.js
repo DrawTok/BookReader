@@ -55,6 +55,33 @@ class CategoryFavorite extends Database {
             }
         }
     }
+
+    async deleteCategoryFavorite(idUser, favCatIds) {
+        let connection;
+        try {
+            connection = await this.connect();
+
+            // Create an array of arrays for idUser and each favCatId
+            const listFavCatId = favCatIds.map(favCatId => [idUser, favCatId]);
+
+            const query = "DELETE FROM `favourites_cat` WHERE (idUser, idCategory) IN (?)";
+            const [result] = await connection.query(query, [listFavCatId]);
+
+            if (result.affectedRows > 0) {
+                return { success: true, message: "Deleted successfully!" };
+            } else {
+                return { success: false, message: "No records deleted. Check your input data." };
+            }
+        } catch (error) {
+            console.error("Error: ", error.message);
+            throw error;
+        } finally {
+            if (connection) {
+                connection.end();
+            }
+        }
+    }
+
 }
 
 module.exports = new CategoryFavorite();

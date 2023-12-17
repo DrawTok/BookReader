@@ -57,6 +57,35 @@ class CategoryController {
             });
         }
     }
+
+    deleteCategoryFav(req, res) {
+        try {
+            const { idUser, favCatIds } = req.body;
+
+            if (!idUser || !favCatIds || favCatIds.length === 0) {
+                return res.json({
+                    success: false,
+                    error: "Missing input parameters..."
+                });
+            }
+
+            category.deleteCategoryFavorite(idUser, favCatIds).then(result => {
+                res.json(result);
+            }).catch(error => {
+                console.error('An error occurred:', error);
+                res.json({
+                    success: false,
+                    error: 'An error occurred while processing the request.'
+                });
+            });
+        } catch (error) {
+            console.error('An error occurred:', error);
+            res.json({
+                success: false,
+                error: 'An error occurred while processing the request.'
+            });
+        }
+    }
 }
 
 module.exports = new CategoryController();
