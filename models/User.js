@@ -9,7 +9,7 @@ class User extends Database {
         let connection;
         try {
             connection = await this.connect();
-          
+
             const query = "SELECT email, fullName, birthDay, role FROM users WHERE idUser = ?";
             const [results] = await connection.query(query, [idUser]);
 
@@ -101,7 +101,7 @@ class User extends Database {
                 "SELECT COUNT(*) AS count FROM users WHERE email = ?",
                 [email]
             );
-          
+
             if (countEmails[0].count > 0) {
                 return { success: false, error: "Email already exists..." };
             }
@@ -112,11 +112,11 @@ class User extends Database {
                 .digest("hex");
 
             const query =
-                "INSERT INTO users (fullName, birthDay, email, password, role) VALUES (?, ?, ?, ?, ?)";
+                "INSERT INTO users (email, fullName, birthDay, password, role) VALUES (?, ?, ?, ?, ?)";
             const [results] = await connection.query(query, [
+                email,
                 fullName,
                 birthDay,
-                email,
                 hashedPassword,
                 role,
             ]);
@@ -212,4 +212,4 @@ class User extends Database {
     }
 }
 
-module.exports = User;
+module.exports = new User();
