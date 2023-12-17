@@ -39,7 +39,7 @@ class Category extends Database {
             const [result] = await connection.query(query);
 
             if (result !== null) {
-                const modifiedResult = result.map(category => ({ ...category, active: false }));
+                const modifiedResult = result.map(categoryItem => ({ ...categoryItem, active: false }));
                 return { success: true, result: modifiedResult };
             } else {
                 return { success: false, message: "Failed to insert category..." };

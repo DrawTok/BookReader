@@ -112,7 +112,7 @@ class User extends Database {
                 .digest("hex");
 
             const query =
-                "INSERT INTO users (idUser, email, phoneNumber, fullName, birthDay, password, role) VALUES (NULL, ?, NULL, ?, ?, ?, ?)";
+                "INSERT INTO users (email, fullName, birthDay, password, role) VALUES (?, ?, ?, ?, ?)";
             const [results] = await connection.query(query, [
                 email,
                 fullName,
