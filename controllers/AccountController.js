@@ -1,5 +1,17 @@
-
+const nodemailer = require('nodemailer');
 const user = require("../models/User");
+const randomString = require('randomstring');
+
+const transporter = nodemailer.createTransport({
+    host: 'mail.openjavascript.info',
+    port: 465,
+    service: true,
+    service: 'gmail',
+    auth: {
+        user: 'bookreadertlu3@gmail.com',
+        pass: 'iheb ndhu kspq dnom'
+    }
+});
 
 class AccountController {
 
@@ -158,6 +170,103 @@ class AccountController {
             });
         }
     }
+
+    forgotPassword(req, res) {
+        try {
+            const email = req.params.email;
+            if (!email) {
+                return res.json({
+                    success: false,
+                    error: 'Missing input parameters...'
+                });
+            }
+
+            const otp = randomString.generate({
+                length: 6,
+                charset: 'numeric'
+            });
+
+            user.insertIntoActiveKey(email, otp);
+
+            const mailOptions = {
+                from: 'bookreadertlu3@gmail.com',
+                to: email,
+                subject: 'Reset Password OTP',
+                text: `Your OTP for password reset is: ${otp}`
+            };
+
+            transporter.sendMail(mailOptions, (error, info) => {
+                if (error) {
+                    console.error(error);
+                    res.json({
+                        success: false,
+                        error: 'Failed to send OTP email'
+                    });
+                } else {
+                    console.log('Email sent: ' + info.response);
+                    res.json({
+                        success: true,
+                        message: 'OTP sent successfully'
+                    });
+                }
+            });
+        } catch (error) {
+            console.error('An error occurred:', error);
+            res.json({
+                success: false,
+                error: 'An error occurred while processing the request.'
+            });
+        }
+    }
+
+    authOTP(req, res) {
+
+        const { email, otp } = req.body;
+        if (!email || !otp) {
+            return res.json({
+                success: false,
+                error: 'Missing input parameters...'
+            });
+        }
+
+        user.authOTP(email, otp).then(result => {
+            res.json(result);
+        }).catch(error => {
+            console.error('An error occurred:', error);
+            res.json({
+                success: false,
+                error: user.message
+            });
+        });
+    }
+
+    resetPassword(req, res) {
+        const { email, newPassword, otp, rePassword } = req.body;
+        if (!email || !newPassword || !otp || !rePassword) {
+            return res.json({
+                success: false,
+                error: 'Missing input parameters...'
+            });
+        }
+
+        if (rePassword !== newPassword) {
+            return res.json({
+                success: false,
+                error: "The two passwords are not the same.",
+            });
+        }
+
+        user.resetPassword(email, newPassword, otp).then(result => {
+            res.json(result);
+        }).catch(error => {
+            console.error('An error occurred:', error);
+            res.json({
+                success: false,
+                error: user.message
+            });
+        });
+    }
+
 }
 
 module.exports = new AccountController();

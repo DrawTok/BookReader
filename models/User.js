@@ -1,5 +1,9 @@
+
 const Database = require("./Database");
 const crypto = require("crypto");
+
+const curSeconds = Math.floor(new Date().getTime() / 1000);
+
 class User extends Database {
     constructor() {
         super();
@@ -32,9 +36,9 @@ class User extends Database {
             connection = await this.connect();
 
             // Check if the email exists
-            const isEmailExists = await this.isExistsEmail(email);
+            const isExistsEmail = await this.isExistsEmail(email);
 
-            if (!isEmailExists) {
+            if (!isExistsEmail) {
                 return { success: false, error: "Account does not exist" };
             }
 
@@ -208,6 +212,127 @@ class User extends Database {
             if (connection) {
                 connection.end();
             }
+        }
+    }
+
+    async insertIntoActiveKey(email, code) {
+        const connection = await this.connect();
+
+        try {
+            const querySelect = "SELECT email, code, time FROM active_key WHERE email = ?";
+            const [existingRecord] = await connection.query(querySelect, [email]);
+
+            let query;
+
+            if (!existingRecord.length) {
+                query = 'INSERT INTO active_key (email, code, time) VALUES (?, ?, ?)';
+                const values = [email, code, curSeconds];
+
+                await connection.query(query, values);
+                console.log('Inserted into active_key successfully');
+            } else {
+                query = "UPDATE active_key SET code = ?, time = ? WHERE email = ?";
+
+                await connection.query(query, [code, curSeconds, email]);
+                console.log('Updated active_key successfully');
+            }
+
+            connection.end();
+        } catch (error) {
+            console.error('Error inserting/updating into active_key:', error);
+        }
+    }
+
+
+    async authOTP(email, otp) {
+        const connection = await this.connect();
+
+        const query = "SELECT code, time FROM active_key WHERE email = ?";
+        const [resultOTP] = await connection.query(query, [email]);
+        connection.end();
+        if (resultOTP[0]?.code === otp) {
+            const timeRemaining = curSeconds - resultOTP[0]?.time;
+            if (timeRemaining <= 120 && timeRemaining >= 0) {
+                return {
+                    success: true,
+                    message: "OTP authentication successful."
+                }
+            } else
+                return {
+                    success: false,
+                    message: "OTP has expired."
+                }
+        }
+        return {
+            success: false,
+            message: "OTP is incorrect. Please try again.",
+        };
+    }
+
+    async resetPassword(email, newPassword, otp) {
+        try {
+            const connection = await this.connect();
+
+            const query = "SELECT code FROM active_key WHERE email = ?";
+            const [resultOTP] = await connection.query(query, [email]);
+            if (resultOTP[0]?.code === otp) {
+                const hashedPassword = await crypto
+                    .createHash("sha256")
+                    .update(newPassword)
+                    .digest("hex");
+
+                const [resultUpdatePassword] = await connection.query(
+                    "UPDATE users SET password = ? WHERE email = ?",
+                    [hashedPassword, email]
+                );
+
+                connection.end();
+
+                if (resultUpdatePassword.affectedRows > 0) {
+                    this.deleteActiveKey(email);
+                    return {
+                        success: true,
+                        message: "Password updated successfully.",
+                    };
+                } else {
+                    return {
+                        success: false,
+                        message: "User not found. Password update failed.",
+                    };
+                }
+            } else {
+                console.error("Error resetting password:", error.message);
+                return {
+                    success: false,
+                    message: "An error occurred during password reset."
+                };
+            }
+
+        } catch (error) {
+            console.error("Error resetting password:", error.message);
+            return {
+                success: false,
+                message: "An error occurred during password reset.",
+            };
+        }
+    }
+
+    async deleteActiveKey(email) {
+        const connection = await this.connect();
+
+        try {
+            const query = "DELETE FROM active_key WHERE email = ?";
+            const [result] = await connection.query(query, [email]);
+
+            if (result.affectedRows > 0) {
+                console.log('Deleted active key successfully');
+            } else {
+                console.log('No active key found for the specified email');
+            }
+        } catch (error) {
+            console.error('Error deleting active key:', error);
+        } finally {
+            connection.end();
         }
     }
 }

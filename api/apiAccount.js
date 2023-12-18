@@ -22,4 +22,16 @@ router.post('/authLogin', async (req, res) => {
     await AccountController.authLogin(req, res);
 });
 
+router.post('/forgotPassword/:email', async (req, res) => {
+    await AccountController.forgotPassword(req, res);
+});
+
+router.post('/authOTP', async (req, res) => {
+    await AccountController.authOTP(req, res);
+});
+
+router.post('/resetPassword', async (req, res) => {
+    await AccountController.resetPassword(req, res);
+});
+
 module.exports = router;
