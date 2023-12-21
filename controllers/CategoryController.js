@@ -56,6 +56,35 @@ class CategoryController {
         }
     }
 
+    getTopicUserInterest(req, res){
+        try {
+            const idUser = req.params.idUser;
+            if(!idUser){
+                return res.json({
+                    success: false,
+                    error: "Missing input parameters..."
+                });
+            }
+
+            category.getTopicUserInterest(idUser).then(result => {
+                res.json(result);
+            }).catch(error => {
+                console.error('An error occurred:', error);
+                res.json({
+                    success: false,
+                    error: 'An error occurred while processing the request.'
+                });
+            });
+
+        } catch (error) {
+            console.error('An error occurred:', error);
+            res.json({
+                success: false,
+                error: 'An error occurred while processing the request.'
+            });
+        }
+    }
+
     createCategoryFav(req, res) {
         try {
             const { idUser, favCatIds } = req.body;

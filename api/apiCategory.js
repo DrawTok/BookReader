@@ -24,4 +24,7 @@ router.delete('/deleteCategoryFav/', async (req, res) => {
     await CategoryController.deleteCategoryFav(req, res);
 });
 
+router.get('/getCategoryUserInterest/:idUser', async (req, res) => {
+    await CategoryController.getTopicUserInterest(req, res);
+})
 module.exports = router;
