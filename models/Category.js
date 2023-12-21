@@ -1,5 +1,6 @@
 const Database = require("./Database");
-
+const axios = require('axios');
+const linkBook = "https://gutendex.com/books/";
 class Category extends Database {
     constructor() {
         super();
@@ -27,6 +28,37 @@ class Category extends Database {
             if (connection) {
                 connection.end();
             }
+        }
+    }
+
+    async getTopicUserInterest(idUser) {
+        try {
+            const { success, result } = await this.getCategoryFavorite(idUser);
+
+            if (success && result.length > 0) {
+                const randomIndex = Math.floor(Math.random() * result.length);
+                const randomCategory = result[randomIndex];
+
+                const randomTopic = randomCategory.name;
+
+                const response = await axios.get(`${linkBook}?${randomTopic}`);
+
+                const jsonData = response.data;
+
+                const fetchedData = jsonData.results.map(book => ({
+                    id: book.id,
+                    title: book.title,
+                    format: {
+                        jpegImage: book.formats["image/jpeg"],
+                    }
+                }));
+                return { success: true, result: fetchedData };
+            } else {
+                return { success: false, message: "Failed to retrieve user interests..." };
+            }
+        } catch (error) {
+            console.error("Error: ", error.message);
+            throw error;
         }
     }
 
@@ -131,7 +163,7 @@ class Category extends Database {
         }
     }
 
-    
+
 }
 
 module.exports = new Category();
