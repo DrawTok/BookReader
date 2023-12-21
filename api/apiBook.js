@@ -6,8 +6,8 @@ router.get('/getLikeCategory/', async (req, res) => {
     await BookController.fetchData(req, res);
 });
 
-router.post('/getDataCategoryId/:categoryId', async (req, res) => {
-    await BookController.getDataCategoryId(req, res);
+router.post('/getBookDetail/:bookId', async (req, res) => {
+    await BookController.getBookDetailById(req, res);
 });
 
 router.post('/saveLastPageReading/', async (req, res) => {

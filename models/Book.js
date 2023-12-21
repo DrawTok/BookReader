@@ -1,4 +1,4 @@
-const axios = require('axios');
+const axios = require("axios");
 const linkBook = "https://gutendex.com/books/";
 const Database = require("./Database");
 
@@ -13,18 +13,20 @@ class Book extends Database {
                     params: {
                         page: currentPage,
                         topic: category,
-                    }
+                    },
                 });
 
                 const jsonData = response.data;
 
-                fetchedData = fetchedData.concat(jsonData.results.map(book => ({
-                    id: book.id,
-                    title: book.title,
-                    format: {
-                        jpegImage: book.formats["image/jpeg"],
-                    }
-                })));
+                fetchedData = fetchedData.concat(
+                    jsonData.results.map((book) => ({
+                        id: book.id,
+                        title: book.title,
+                        format: {
+                            jpegImage: book.formats["image/jpeg"],
+                        },
+                    }))
+                );
 
                 if (quantity !== -1) {
                     if (fetchedData.length >= quantity) {
@@ -38,7 +40,6 @@ class Book extends Database {
                 } else {
                     break;
                 }
-
             } while (true);
 
             const extractedData = {
@@ -47,89 +48,64 @@ class Book extends Database {
             };
 
             return extractedData;
-
         } catch (error) {
-            console.error('Error fetching data:', error.message);
+            console.error("Error fetching data:", error.message);
         }
     }
 
-    async getDataCategoryId(categoryId) {
+    async getBookDetailById(bookId) {
         try {
             const response = await axios.get(linkBook, {
                 params: {
-                    ids: categoryId,
+                    ids: bookId,
                 },
             });
 
             const jsonData = response.data;
 
-            const fetchedData = jsonData.results.map(book => ({
-                id: book.id,
-                title: book.title,
-                author: book.authors.map(author => ({
-                    name: author.name,
-                    birth_year: author.birth_year,
-                    death_year: author.death_year,
-                })),
-                subject: book.subjects,
+            const fetchedData = jsonData.results.map((book) => ({
+                ...book,
                 format: {
                     jpegImage: book.formats["image/jpeg"],
-                    plainText: book.formats["application/epub+zip"].replace(".images", ''),
+                    plainText: book.formats["application/epub+zip"].replace(".images", ""),
                 },
             }));
 
             return fetchedData;
-
         } catch (error) {
-            console.error('Error fetching data:', error.message);
+            console.error("Error fetching data:", error.message);
             throw error;
         }
     }
 
     async saveReading(idUser, idBook, lastPageReading) {
+        const success = {
+            success: true,
+            message: "Successful.",
+        };
+
+        const fail = {
+            success: false,
+            message: "An error occurred.",
+        };
+
         try {
             const connection = await this.connect();
 
-            const queryReadUID = "SELECT * FROM `reading` WHERE idUser = ?";
-            const [resultReadUID] = await connection.query(queryReadUID, [idUser]);
+            const queryReadUID = "SELECT * FROM `reading` WHERE idUser = ? AND idBook = ?";
+            const [resultReadUID] = await connection.query(queryReadUID, [idUser, idBook]);
 
-            const UID = resultReadUID[0]?.idUser;
-            const BID = resultReadUID[0]?.idBook;
-            const lastPR = resultReadUID[0]?.lastPageReading;
-            if (UID !== idUser && BID !== idBook && lastPR !== lastPageReading) {
-
+            if (!resultReadUID) {
                 const query = "INSERT INTO `reading`(idUser, idBook, lastPageReading) VALUES (?, ?, ?)";
                 const [results] = await connection.query(query, [idUser, idBook, lastPageReading]);
-                if (results.affectedRows > 0) {
-                    return {
-                        success: true,
-                        message: "Successful."
-                    };
-                } else {
-                    return {
-                        success: false,
-                        message: "An error occurred."
-                    };
-                }
-
-
-            } else if (UID === idUser && BID === idBook) {
+                return results.affectedRows > 0 ? success : fail;
+            } else if (resultReadUID) {
                 const query = "UPDATE `reading` SET lastPageReading = ? WHERE idUser = ? AND idBook = ?";
-                const [results] = await connection.query(query,
-                    [lastPageReading, UID, BID]);
-                if (results.affectedRows > 0) {
-                    return {
-                        success: true,
-                        message: "Successful."
-                    };
-                } else {
-                    return {
-                        success: false,
-                        message: "An error occurred."
-                    };
-                }
-            } else
+                const [results] = await connection.query(query, [lastPageReading, idUser, idBook]);
+                return results.affectedRows > 0 ? success : fail;
+            } else {
                 console.log("EXISTS...");
+            }
         } catch (error) {
             console.error("Error:", error.message);
             return {
@@ -140,35 +116,31 @@ class Book extends Database {
     }
 
     async searchByNameAndCategory(nameBook, topic) {
-
         try {
             const response = await axios.get(`${linkBook}?search=${nameBook}&topic=${topic}`);
 
             const jsonData = response.data;
 
-            const fetchedData = jsonData.results.map(book => ({
+            const fetchedData = jsonData.results.map((book) => ({
                 id: book.id,
                 title: book.title,
-                author: book.authors.map(author => ({
+                author: book.authors.map((author) => ({
                     name: author.name,
                     birth_year: author.birth_year,
                     death_year: author.death_year,
                 })),
                 subject: book.subjects,
                 format: {
-                    jpegImage: book.formats["image/jpeg"]
+                    jpegImage: book.formats["image/jpeg"],
                 },
             }));
 
             return fetchedData;
-
         } catch (error) {
-            console.error('Error during API request:', error.message);
+            console.error("Error during API request:", error.message);
             throw error;
         }
     }
-
 }
-
 
 module.exports = new Book();
