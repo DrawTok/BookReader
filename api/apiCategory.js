@@ -13,15 +13,15 @@ router.get('/getCategory', async (req, res) => {
 });
 
 router.post('/addCategoryFav/', async (req, res) => {
-    await categoryController.createCategoryFav(req, res);
+    await CategoryController.createCategoryFav(req, res);
 });
 
 router.get('/getCategoryFav/:idUser', async (req, res) => {
-    await categoryController.getCategoryFav(req, res);
+    await CategoryController.getCategoryFav(req, res);
 });
 
 router.delete('/deleteCategoryFav/', async (req, res) => {
-    await categoryController.deleteCategoryFav(req, res);
+    await CategoryController.deleteCategoryFav(req, res);
 });
 
 module.exports = router;
