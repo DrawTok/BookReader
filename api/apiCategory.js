@@ -12,7 +12,7 @@ router.get('/getCategory', async (req, res) => {
     await CategoryController.getCategory(req, res);
 });
 
-router.post('/addCategoryFav/', async (req, res) => {
+router.post('/addFavCategory/', async (req, res) => {
     await categoryController.createCategoryFav(req, res);
 });
 
