@@ -94,6 +94,10 @@ class User extends Database {
         try {
             connection = await this.connect();
 
+            if (!emailValidator.validate(email)) {
+                return { success: false, error: "Invalid email format..." };
+            }
+
             const [countEmails] = await connection.query("SELECT COUNT(*) AS count FROM users WHERE email = ?", [email]);
 
             if (countEmails[0].count > 0) {

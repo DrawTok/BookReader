@@ -53,6 +53,8 @@ class Category extends Database {
             }
         }
     }
+
+    
 }
 
 module.exports = new Category();
