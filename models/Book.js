@@ -65,7 +65,7 @@ class Book extends Database {
 
             const fetchedData = jsonData.results.map((book) => ({
                 ...book,
-                format: {
+                formats: {
                     jpegImage: book.formats["image/jpeg"],
                     plainText: book.formats["application/epub+zip"].replace(".images", ""),
                 },
