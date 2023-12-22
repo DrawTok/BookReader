@@ -1,5 +1,5 @@
 const Database = require("./Database");
-const axios = require('axios');
+const axios = require("axios");
 const linkBook = "https://gutendex.com/books/";
 class Category extends Database {
     constructor() {
@@ -15,12 +15,10 @@ class Category extends Database {
             const [result] = await connection.query(query, [idCategory, name]);
 
             if (result.affectedRows > 0) {
-
                 return { success: true, message: "Successful" };
             } else {
                 return { success: false, message: "Failed to insert category..." };
             }
-
         } catch (error) {
             console.error("Cannot insert category: ", error.message);
             throw error;
@@ -31,9 +29,9 @@ class Category extends Database {
         }
     }
 
-    async getTopicUserInterest(idUser) {
+    async getUserInterestTopic(idUser) {
         try {
-            const { success, result } = await this.getCategoryFavorite(idUser);
+            const { success, result } = await this.getFavoriteCategory(idUser);
 
             if (success && result.length > 0) {
                 const randomIndex = Math.floor(Math.random() * result.length);
@@ -45,16 +43,13 @@ class Category extends Database {
 
                 const jsonData = response.data;
 
-                const fetchedData = jsonData.results.map(book => ({
-                    id: book.id,
-                    title: book.title,
-                    format: {
-                        jpegImage: book.formats["image/jpeg"],
-                    }
+                const fetchedData = jsonData.results.map((book) => ({
+                    ...book,
+                    cover: book.formats["image/jpeg"],
                 }));
                 return { success: true, result: fetchedData };
             } else {
-                return { success: false, message: "Failed to retrieve user interests..." };
+                return { success: false, message: "Failed to retrieve user interests topic..." };
             }
         } catch (error) {
             console.error("Error: ", error.message);
@@ -71,7 +66,7 @@ class Category extends Database {
             const [result] = await connection.query(query);
 
             if (result !== null) {
-                const modifiedResult = result.map(categoryItem => ({ ...categoryItem, active: false }));
+                const modifiedResult = result.map((categoryItem) => ({ ...categoryItem, active: false }));
                 return { success: true, result: modifiedResult };
             } else {
                 return { success: false, message: "Failed to insert category..." };
@@ -91,7 +86,7 @@ class Category extends Database {
         try {
             connection = await this.connect();
 
-            const listFavCatId = dataIdFavorite.map(categoryId => [idUser, categoryId]);
+            const listFavCatId = dataIdFavorite.map((categoryId) => [idUser, categoryId]);
 
             const query = "INSERT INTO `favourites_cat`(idUser, idCategory) VALUES ?";
             const [result] = await connection.query(query, [listFavCatId]);
@@ -101,7 +96,6 @@ class Category extends Database {
             } else {
                 return { success: false, message: "Failed to insert favorite category..." };
             }
-
         } catch (error) {
             console.error("Error: ", error.message);
             throw error;
@@ -112,17 +106,16 @@ class Category extends Database {
         }
     }
 
-
-    async getCategoryFavorite(idUser) {
+    async getFavoriteCategory(idUser) {
         let connection;
         try {
             connection = await this.connect();
 
-            const query = "SELECT fc.idCategory, name FROM `favourites_cat` fc inner join `categories` c on fc.idCategory = c.idCategory INNER JOIN `users` u on u.idUser = fc.idUser WHERE u.idUser = ?";
+            const query =
+                "SELECT fc.idCategory, name FROM `favourites_cat` fc inner join `categories` c on fc.idCategory = c.idCategory INNER JOIN `users` u on u.idUser = fc.idUser WHERE u.idUser = ?";
             const [result] = await connection.query(query, [idUser]);
 
             if (result.length > 0) {
-
                 return { success: true, result };
             } else {
                 return { success: false, message: "Failed to retrieve categories..." };
@@ -143,7 +136,7 @@ class Category extends Database {
             connection = await this.connect();
 
             // Create an array of arrays for idUser and each favCatId
-            const listFavCatId = favCatIds.map(favCatId => [idUser, favCatId]);
+            const listFavCatId = favCatIds.map((favCatId) => [idUser, favCatId]);
 
             const query = "DELETE FROM `favourites_cat` WHERE (idUser, idCategory) IN (?)";
             const [result] = await connection.query(query, [listFavCatId]);
@@ -162,8 +155,6 @@ class Category extends Database {
             }
         }
     }
-
-
 }
 
 module.exports = new Category();
