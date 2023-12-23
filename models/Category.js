@@ -45,6 +45,11 @@ class Category extends Database {
 
                 const fetchedData = jsonData.results.map((book) => ({
                     ...book,
+                    subjects: book.subjects.map((item) => item.split(" -- ")[0]),
+                    formats: {
+                        epub: book.formats["application/epub+zip"].replace(".images", ""),
+                        image: book.formats["image/jpeg"],
+                    },
                     cover: book.formats["image/jpeg"],
                 }));
                 return { success: true, result: fetchedData };

@@ -39,14 +39,14 @@ class BookController {
             .catch((error) => this.handleError(res, "Please check your network connection and try again."));
     }
 
-    searchByNameAndCategory(req, res) {
-        const { nameBook, categoryName } = req.body;
-        if (!categoryName || !nameBook) {
+    search(req, res) {
+        const { bookName, topic } = req.body;
+        if (!topic || !bookName) {
             this.handleError(res, "Missing input parameters...");
             return;
         }
 
-        book.searchByNameAndCategory(nameBook, categoryName)
+        book.search(bookName, topic)
             .then((result) => res.json(result))
             .catch((error) => this.handleError(res, "Please check your network connection and try again."));
     }
