@@ -14,8 +14,8 @@ router.post('/saveLastPageReading/', async (req, res) => {
     await BookController.saveLastPageReading(req, res);
 });
 
-router.post('/searchByNameAndCategory/', async (req, res) => {
-    await BookController.searchByNameAndCategory(req, res);
+router.post('/search/', async (req, res) => {
+    await BookController.search(req, res);
 });
 
 module.exports = router;

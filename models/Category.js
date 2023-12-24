@@ -1,9 +1,11 @@
 const Database = require("./Database");
 const axios = require("axios");
 const linkBook = "https://gutendex.com/books/";
+const { filterAndMapBooks } = require('../utils/utilsFilterMapBook');
 class Category extends Database {
     constructor() {
         super();
+        Object.assign(this, Database,)
     }
 
     async addNewCategory(idCategory, name) {
@@ -43,11 +45,8 @@ class Category extends Database {
 
                 const jsonData = response.data;
 
-                const fetchedData = jsonData.results.map((book) => ({
-                    ...book,
-                    cover: book.formats["image/jpeg"],
-                }));
-                return { success: true, result: fetchedData };
+                const dataGutendex = await filterAndMapBooks(jsonData.results);
+                return { success: true, result: dataGutendex };
             } else {
                 return { success: false, message: "Failed to retrieve user interests topic..." };
             }
@@ -155,6 +154,7 @@ class Category extends Database {
             }
         }
     }
+
 }
 
 module.exports = new Category();

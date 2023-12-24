@@ -1,7 +1,7 @@
 const axios = require("axios");
 const linkBook = "https://gutendex.com/books/";
 const Database = require("./Database");
-
+const { filterAndMapBooks } = require('../utils/utilsFilterMapBook');
 class Book extends Database {
     async fetchData(category, quantity) {
         try {
@@ -115,25 +115,14 @@ class Book extends Database {
         }
     }
 
-    async searchByNameAndCategory(nameBook, topic) {
+    async search(bookName, topic) {
         try {
-            const response = await axios.get(`${linkBook}?search=${nameBook}&topic=${topic}`);
+            const params = topic === "all" ? `search=${bookName}` : `search=${bookName}&topic=${topic}`;
+            const response = await axios.get(`${linkBook}?${params}`);
 
             const jsonData = response.data;
 
-            const fetchedData = jsonData.results.map((book) => ({
-                id: book.id,
-                title: book.title,
-                author: book.authors.map((author) => ({
-                    name: author.name,
-                    birth_year: author.birth_year,
-                    death_year: author.death_year,
-                })),
-                subject: book.subjects,
-                format: {
-                    jpegImage: book.formats["image/jpeg"],
-                },
-            }));
+            const fetchedData = filterAndMapBooks(jsonData.results);
 
             return fetchedData;
         } catch (error) {
