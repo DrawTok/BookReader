@@ -41,10 +41,7 @@ class BookController {
 
     search(req, res) {
         const { bookName, topic } = req.body;
-        if (!topic || !bookName) {
-            this.handleError(res, "Missing input parameters...");
-            return;
-        }
+
 
         book.search(bookName, topic)
             .then((result) => res.json(result))

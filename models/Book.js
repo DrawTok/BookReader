@@ -130,6 +130,8 @@ class Book extends Database {
             throw error;
         }
     }
+
+    
 }
 
 module.exports = new Book();
