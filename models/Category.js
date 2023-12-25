@@ -36,12 +36,13 @@ class Category extends Database {
             const { success, result } = await this.getFavoriteCategory(idUser);
 
             if (success && result.length > 0) {
+                console.log(result);
                 const randomIndex = Math.floor(Math.random() * result.length);
                 const randomCategory = result[randomIndex];
 
                 const randomTopic = randomCategory.name;
-
-                const response = await axios.get(`${linkBook}?${randomTopic}`);
+                console.log(randomTopic);
+                const response = await axios.get(`${linkBook}?topic=${randomTopic}`);
 
                 const jsonData = response.data;
 
