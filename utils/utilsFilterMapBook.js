@@ -14,6 +14,7 @@ function filterAndMapBooks(results) {
                         image: book.formats["image/jpeg"],
                         epub: book.formats["application/epub+zip"],
                     },
+                    download_count: book.download_count
                 };
             }
             return null;

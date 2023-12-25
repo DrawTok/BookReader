@@ -25,6 +25,7 @@ class Book extends Database {
                         format: {
                             jpegImage: book.formats["image/jpeg"],
                         },
+                        download_count: book.download_count
                     }))
                 );
 
@@ -69,6 +70,7 @@ class Book extends Database {
                     jpegImage: book.formats["image/jpeg"],
                     plainText: book.formats["application/epub+zip"].replace(".images", ""),
                 },
+                download_count: book.download_count
             }));
 
             return fetchedData;
