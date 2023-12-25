@@ -8,7 +8,7 @@ function filterAndMapBooks(results) {
                 return {
                     id: book.id,
                     title: book.title,
-                    author: book.authors,
+                    author: book.authors || "updating...",
                     subjects: book.subjects.map((item) => item.split(" -- ")[0]),
                     formats: {
                         image: book.formats["image/jpeg"],
