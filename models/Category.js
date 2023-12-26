@@ -31,6 +31,21 @@ class Category extends Database {
         }
     }
 
+    async getTrending(){
+        try {
+            const response = await axios.get(`${linkBook}?sort=ascendingdescendingpopular`);
+
+            const jsonData = response.data;
+
+            const fetchedData = filterAndMapBooks(jsonData.results);
+
+            return fetchedData;
+        } catch (error) {
+            console.error("Error during API request:", error.message);
+            throw error;
+        }
+    }
+
     async getUserInterestTopic(idUser) {
         try {
             const { success, result } = await this.getFavoriteCategory(idUser);

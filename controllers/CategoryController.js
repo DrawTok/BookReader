@@ -34,7 +34,29 @@ class CategoryController {
         }
     }
 
-    //updateCategory(req, res) { }
+
+    getTrending(req, res){
+        try {
+            category
+                .getTrending()
+                .then((result) => {
+                    res.json(result);
+                })
+                .catch((error) => {
+                    console.error("An error occurred:", error);
+                    res.json({
+                        success: false,
+                        error: "An error occurred while processing the request.",
+                    });
+                });
+        } catch (error) {
+            console.error("An error occurred:", error);
+            res.json({
+                success: false,
+                error: "An error occurred while processing the request.",
+            });
+        }
+    }
 
     getCategory(req, res) {
         try {
@@ -122,8 +144,6 @@ class CategoryController {
             });
         }
     }
-
-    //updateCategory(req, res) { }
 
     getFavCategory(req, res) {
         try {

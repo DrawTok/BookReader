@@ -11,6 +11,10 @@ router.get('/getCategory', async (req, res) => {
     await CategoryController.getCategory(req, res);
 });
 
+router.get('/getTrending', async (req, res)=>{
+    await CategoryController.getTrending(req, res);
+});
+
 router.post("/addFavCategory/", async (req, res) => {
     await CategoryController.createFavCategory(req, res);
 });

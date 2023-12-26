@@ -10,12 +10,12 @@ router.post('/getBookDetail/:bookId', async (req, res) => {
     await BookController.getBookDetailById(req, res);
 });
 
-router.post('/saveLastPageReading/', async (req, res) => {
-    await BookController.saveLastPageReading(req, res);
-});
-
 router.post('/search/', async (req, res) => {
     await BookController.search(req, res);
 });
+
+router.post('/updateStatus/', async (req, res)=>{
+    await BookController.updateStatus(req, res);
+})
 
 module.exports = router;

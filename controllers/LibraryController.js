@@ -3,14 +3,26 @@ const library = require("../models/Library");
 class LibraryController{
 
     saveReadingProcess(req, res){
-        const { idUser, idBook, status } = req.body;
+        const { idUser, idBook, status, lastPageReading } = req.body;
 
         if (!idUser || !idBook || !status) {
             this.handleError(res, 'Missing input parameters...');
             return;
         }
 
-        library.saveBookRead(idUser, idBook, status).then(result => res.json(result))
+        library.saveBookRead(idUser, idBook, status, lastPageReading).then(result => res.json(result))
+            .catch(error => this.handleError
+                (res, 'Please check your network connection and try again.'));
+    }
+
+    getBookByStatus(req, res){
+        const {idUser, status} = req.body;
+        if (!idUser || !status) {
+            this.handleError(res, 'Missing input parameters...');
+            return;
+        }
+
+        library.getBookByStatus(idUser, status).then(result => res.json(result))
             .catch(error => this.handleError
                 (res, 'Please check your network connection and try again.'));
     }
@@ -22,6 +34,8 @@ class LibraryController{
             error: 'An error occurred. ' + errorMessage
         });
     }
+
+    
 }
 
 module.exports = new LibraryController();

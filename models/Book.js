@@ -1,7 +1,18 @@
 const axios = require("axios");
 const linkBook = "https://gutendex.com/books/";
 const Database = require("./Database");
-const { filterAndMapBooks } = require('../utils/utilsFilterMapBook');
+const { getBookDetailById, filterAndMapBooks } = require('../utils/utilsFilterMapBook');
+
+
+const success = {
+    success: true,
+    message: "Successful.",
+};
+
+const fail = {
+    success: false,
+    message: "An error occurred.",
+};
 class Book extends Database {
     async fetchData(category, quantity) {
         try {
@@ -56,65 +67,11 @@ class Book extends Database {
 
     async getBookDetailById(bookId) {
         try {
-            const response = await axios.get(linkBook, {
-                params: {
-                    ids: bookId,
-                },
-            });
-
-            const jsonData = response.data;
-
-            const fetchedData = jsonData.results.map((book) => ({
-                ...book,
-                authors: book.authors || "updating...",
-                formats: {
-                    jpegImage: book.formats["image/jpeg"],
-                    plainText: book.formats["application/epub+zip"].replace(".images", ""),
-                },
-                
-            }));
-
+            const fetchedData = getBookDetailById(bookId);
             return fetchedData;
         } catch (error) {
             console.error("Error fetching data:", error.message);
             throw error;
-        }
-    }
-
-    async saveReading(idUser, idBook, lastPageReading) {
-        const success = {
-            success: true,
-            message: "Successful.",
-        };
-
-        const fail = {
-            success: false,
-            message: "An error occurred.",
-        };
-
-        try {
-            const connection = await this.connect();
-
-            const queryReadUID = "SELECT * FROM `reading` WHERE idUser = ? AND idBook = ?";
-            const [resultReadUID] = await connection.query(queryReadUID, [idUser, idBook]);
-
-            if (!resultReadUID) {
-                const query = "INSERT INTO `reading`(idUser, idBook, lastPageReading) VALUES (?, ?, ?)";
-                const [results] = await connection.query(query, [idUser, idBook, lastPageReading]);
-                return results.affectedRows > 0 ? success : fail;
-            } else if (resultReadUID) {
-                const query = "UPDATE `reading` SET lastPageReading = ? WHERE idUser = ? AND idBook = ?";
-                const [results] = await connection.query(query, [lastPageReading, idUser, idBook]);
-                return results.affectedRows > 0 ? success : fail;
-            } else {
-                console.log("EXISTS...");
-            }
-        } catch (error) {
-            console.error("Error:", error.message);
-            return {
-                success: false,
-                message: "An error occurred during save reading.",
-            };
         }
     }
 
@@ -134,7 +91,21 @@ class Book extends Database {
         }
     }
 
-    
+    async updateStatus(idUser, idBook, status) {
+        try {
+            const connection = await this.connect();
+            const queryUpdateStatus = "UPDATE `libraries` SET status = ? WHERE idUser = ? AND idBook = ?";
+            const [results] = await connection.query(queryUpdateStatus, [status, idUser, idBook]);
+            return results.affectedRows > 0 ? success : fail;
+        } catch (error) {
+            console.error("Error:", error.message);
+            return {
+                success: false,
+                message: "An error occurred during save reading.",
+            };
+        }
+    }
+
 }
 
 module.exports = new Book();
