@@ -78,7 +78,7 @@ class Library extends Database {
             } else {
                 return {
                     success: false,
-                    message: ""
+                    message: "No data"
                 };
             }
         } catch (error) {
