@@ -14,7 +14,7 @@ function filterAndMapBooks(results) {
                     subjects: book.subjects.map((item) => item.split(" -- ")[0]),
                     formats: {
                         image: book.formats["image/jpeg"],
-                        epub: book.formats["application/epub+zip"].replace(".images", ""),
+                        epub: book.formats["application/epub+zip"].replace("3.images", ""),
                     },
                     download_count: book.download_count
                 };

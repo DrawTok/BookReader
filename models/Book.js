@@ -106,6 +106,28 @@ class Book extends Database {
         }
     }
 
+    async getLastPageReading(idUser, idBook) {
+        try {
+            const connection = await this.connect();
+            const query = "SELECT lastPageReading from `libraries` WHERE idUser = ? AND idBook = ?";
+            const [results] = await connection.query(query, [idUser, idBook]);
+            if(results.length > 0){
+                return {
+                    success: true,
+                    result: results
+                }
+            }else{
+                return fail;
+            }
+        } catch (error) {
+            console.error("Error:", error.message);
+            return {
+                success: false,
+                message: "An error occurred during save reading.",
+            };
+        }
+    }
+
 }
 
 module.exports = new Book();

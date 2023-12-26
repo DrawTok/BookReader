@@ -10,6 +10,10 @@ router.post('/getBookDetail/:bookId', async (req, res) => {
     await BookController.getBookDetailById(req, res);
 });
 
+router.get('/getLastPageReading/', async(req, res)=>{
+    await BookController.getLastPageReading(req, res);
+});
+
 router.post('/search/', async (req, res) => {
     await BookController.search(req, res);
 });

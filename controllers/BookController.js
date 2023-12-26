@@ -27,16 +27,16 @@ class BookController {
             .catch((error) => this.handleError(res, "Please check your network connection and try again."));
     }
 
-    saveLastPageReading(req, res) {
-        const { idUser, idBook, lastPageReading } = req.body;
-        if (!idUser || !idBook || !lastPageReading) {
+    getLastPageReading(req, res){
+        const {idUser, idBook} = req.body;
+        if (!idUser || !idBook) {
             this.handleError(res, "Missing input parameters...");
             return;
         }
-
-        book.saveReading(idUser, idBook, lastPageReading)
+        
+        book.getLastPageReading(idUser, idBook)
             .then((result) => res.json(result))
-            .catch((error) => this.handleError(res, "Please check your network connection and try again."));
+            .catch((error) => this.handleError(res, error.errorMessage));
     }
 
     search(req, res) {
