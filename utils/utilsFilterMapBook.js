@@ -10,7 +10,7 @@ function filterAndMapBooks(results) {
                 return {
                     id: book.id,
                     title: book.title,
-                    authors: book.authors || "updating...",
+                    authors: book.authors || [{ name: "", birth_year: "", death_year: "" }],
                     subjects: book.subjects.map((item) => item.split(" -- ")[0]),
                     formats: {
                         image: book.formats["image/jpeg"],
@@ -40,7 +40,7 @@ async function getBookDetailById(bookIds) {
 
             return {
                 ...book,
-                authors: book.authors || "updating...",
+                authors: book.authors || [{ name: "", birth_year: "", death_year: "" }],
                 subjects: book.subjects.map((item) => item.split(" -- ")[0]),
                 formats: {
                     image: book.formats["image/jpeg"],
