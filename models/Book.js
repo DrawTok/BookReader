@@ -33,8 +33,8 @@ class Book extends Database {
                     jsonData.results.map((book) => ({
                         id: book.id,
                         title: book.title,
-                        format: {
-                            jpegImage: book.formats["image/jpeg"],
+                        formats: {
+                            image: book.formats["image/jpeg"]
                         },
                         download_count: book.download_count
                     }))
@@ -111,12 +111,12 @@ class Book extends Database {
             const connection = await this.connect();
             const query = "SELECT lastPageReading from `libraries` WHERE idUser = ? AND idBook = ?";
             const [results] = await connection.query(query, [idUser, idBook]);
-            if(results.length > 0){
+            if (results.length > 0) {
                 return {
                     success: true,
                     result: results
                 }
-            }else{
+            } else {
                 return fail;
             }
         } catch (error) {

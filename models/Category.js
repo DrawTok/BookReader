@@ -5,7 +5,7 @@ const { filterAndMapBooks } = require('../utils/utilsFilterMapBook');
 class Category extends Database {
     constructor() {
         super();
-        Object.assign(this, Database,)
+        Object.assign(this, Database)
     }
 
     async addNewCategory(idCategory, name) {
@@ -31,7 +31,7 @@ class Category extends Database {
         }
     }
 
-    async getTrending(){
+    async getTrending() {
         try {
             const response = await axios.get(`${linkBook}?sort=ascendingdescendingpopular`);
 

@@ -1,0 +1,1 @@
+const Dictionary = require("../models/Dictionary")
