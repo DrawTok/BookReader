@@ -3,7 +3,6 @@ require("dotenv").config();
 
 class Database {
     constructor() {
-        console.log(process.env);
         this.serverName = process.env.SERVER_NAME;
         this.databaseName = process.env.DATABASE_NAME;
         this.databaseUser = process.env.DATABASE_USER;
