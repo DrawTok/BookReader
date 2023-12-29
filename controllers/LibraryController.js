@@ -16,7 +16,7 @@ class LibraryController{
     }
 
     getBookByStatus(req, res){
-        const {idUser, status} = req.body;
+        const {idUser, status} = req.params;
         if (!idUser || !status) {
             this.handleError(res, 'Missing input parameters...');
             return;
@@ -35,7 +35,7 @@ class LibraryController{
         });
     }
 
-    
+
 }
 
 module.exports = new LibraryController();

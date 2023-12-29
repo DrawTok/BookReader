@@ -6,7 +6,7 @@ router.post("/saveReadingProcess/", async (req, res) => {
     await LibraryController.saveReadingProcess(req, res);
 });
 
-router.get("/getBookByStatus/", async (req, res) => {
+router.get("/getBookByStatus/:idUser/:status", async (req, res) => {
     await LibraryController.getBookByStatus(req, res);
 });
 
