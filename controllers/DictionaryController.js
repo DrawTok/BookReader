@@ -69,6 +69,26 @@ class DictionaryController {
             });
         });
     }
+
+    translateWord(req, res){
+        const word = req.params.word;
+        if(!word){
+            return res.json({
+                success: false,
+                error: "Missing input parameters...",
+            });
+        }
+
+        Dictionary.translateWord(word).then(result => {
+            return res.json(result)
+        }).catch(error => {
+            console.error("An error occurred:", error);
+            res.json({
+                success: false,
+                error: "An error occurred while processing the request.",
+            });
+        });
+    }
 }
 
 module.exports = new DictionaryController();

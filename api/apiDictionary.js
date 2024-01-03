@@ -10,6 +10,10 @@ router.get('/getDictionary/:idUser', async (req, res) => {
     await DictionaryController.getDictionary(req, res);
 });
 
+router.get('/translateWord/:word', async (req, res) => {
+    await DictionaryController.translateWord(req, res);
+});
+
 router.delete('/deleteWord', async (req, res) => {
     await DictionaryController.deleteWord(req, res);
 });
