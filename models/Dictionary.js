@@ -82,6 +82,23 @@ class Dictionary extends Database {
             };
         }
     }
+
+    async deleteWord(idUser, word) {
+        try {
+            const connection = await this.connect();
+            const deleteQuery = "DELETE FROM dictionaries WHERE idUser = ? AND word = ?";
+            const [resultQuery] = await connection.query(deleteQuery, [idUser, word]);
+
+            return resultQuery.affectedRows > 0 ? success : fail;
+
+        } catch (error) {
+            console.error("Error:", error.message);
+            return {
+                success: false,
+                message: "An error occurred during word translation.",
+            };
+        }
+    }
 }
 
 module.exports = new Dictionary();

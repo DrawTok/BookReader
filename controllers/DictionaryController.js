@@ -49,6 +49,26 @@ class DictionaryController {
             });
         });
     }
+
+    deleteWord(req, res) {
+        const { idUser, word } = req.body;
+        if (!idUser || !word) {
+            return res.json({
+                success: false,
+                error: "Missing input parameters...",
+            });
+        }
+
+        Dictionary.deleteWord(idUser, word).then(result => {
+            return res.json(result)
+        }).catch(error => {
+            console.error("An error occurred:", error);
+            res.json({
+                success: false,
+                error: "An error occurred while processing the request.",
+            });
+        });
+    }
 }
 
 module.exports = new DictionaryController();
