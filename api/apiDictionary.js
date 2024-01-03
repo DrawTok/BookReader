@@ -6,4 +6,8 @@ router.post('/addNewWord/', async (req, res) => {
     await DictionaryController.addNewWord(req, res);
 });
 
+router.get('/getDictionary/:idUser', async (req, res) => {
+    await DictionaryController.getDictionary(req, res);
+});
+
 module.exports = router;

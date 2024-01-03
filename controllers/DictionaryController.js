@@ -29,6 +29,26 @@ class DictionaryController {
             });
         }
     }
+
+    getDictionary(req, res) {
+        const idUser = req.params.idUser;
+        if (!idUser) {
+            return res.json({
+                success: false,
+                error: "Missing input parameters...",
+            });
+        }
+
+        Dictionary.getDictionary(idUser).then(result => {
+            return res.json(result)
+        }).catch(error => {
+            console.error("An error occurred:", error);
+            res.json({
+                success: false,
+                error: "An error occurred while processing the request.",
+            });
+        });
+    }
 }
 
 module.exports = new DictionaryController();
