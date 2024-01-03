@@ -37,43 +37,29 @@ class Dictionary extends Database {
     async translateWord(word) {
         try {
             const response = await axios.get(`${LINK_TRANSLATE}${word}`);
-            const jsonData = response.data[0]; // Assuming the response is an array and you want the first result
+            const jsonData = response.data[0];
 
             if (!jsonData) {
                 throw new Error("No data found for the provided word.");
             }
 
-            return {
-                meaning: jsonData.meanings[0]?.definitions[0]?.definition || "No definition available",
-                sentenceContext: jsonData.meanings[0]?.definitions[0]?.example || "No example available",
-            };
-        } catch (error) {
-            console.error("Error:", error.message);
-            return {
-                success: false,
-                message: "An error occurred during word translation.",
-            };
-        }
-    }
-
-    async getDictionary(idUser) {
-        try {
-            const connection = await this.connect();
-            const queryDic = "SELECT * FROM dictionaries WHERE idUser = ?";
-            const [resultQuery] = await connection.query(queryDic, [idUser]);
-
-            if (resultQuery.length > 0) {
-                return {
-                    success: true,
-                    result: resultQuery
-                }
-            } else {
-                return {
-                    success: false,
-                    message: "No data"
-                };
+            const meanings = jsonData.meanings[0];
+            if (!meanings) {
+                throw new Error("No definitions found for the provided word.");
             }
 
+            const phonetics = jsonData.phonetics[1] || {};
+            const definitions = meanings.definitions || [];
+
+            return {
+                text: phonetics.text || "No phonetic text available",
+                audio: phonetics.audio || "No audio available",
+
+                partOfSpeech: meanings.partOfSpeech || "",
+                meaning: definitions[0]?.definition || "No definition available",
+                sentenceContext: definitions[0]?.example || "No example available",
+            };
+
         } catch (error) {
             console.error("Error:", error.message);
             return {
@@ -82,6 +68,7 @@ class Dictionary extends Database {
             };
         }
     }
+
 
     async deleteWord(idUser, word) {
         try {
