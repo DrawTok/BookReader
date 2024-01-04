@@ -1,5 +1,5 @@
 const Database = require("../models/Database");
-const axios = require('axios');
+const axios = require("axios");
 const LINK_TRANSLATE = require("../utils/constant");
 
 const success = {
@@ -15,6 +15,25 @@ const fail = {
 class Dictionary extends Database {
     constructor() {
         super();
+    }
+
+    async getDictionary(idUser) {
+        try {
+            const connection = await this.connect();
+            const selectQuery = "SELECT * FROM dictionaries WHERE idUser = ?";
+            const [results] = await connection.query(selectQuery, [idUser]);
+
+            return {
+                success: true,
+                data: results,
+            };
+        } catch (error) {
+            console.error("Error:", error.message);
+            return {
+                success: false,
+                message: "An error occurred while getting the dictionary.",
+            };
+        }
     }
 
     async addNewWord(idUser, word) {
@@ -59,7 +78,6 @@ class Dictionary extends Database {
                 meaning: definitions[0]?.definition || "No definition available",
                 sentenceContext: definitions[0]?.example || "No example available",
             };
-
         } catch (error) {
             console.error("Error:", error.message);
             return {
@@ -69,7 +87,6 @@ class Dictionary extends Database {
         }
     }
 
-
     async deleteWord(idUser, word) {
         try {
             const connection = await this.connect();
@@ -77,7 +94,6 @@ class Dictionary extends Database {
             const [resultQuery] = await connection.query(deleteQuery, [idUser, word]);
 
             return resultQuery.affectedRows > 0 ? success : fail;
-
         } catch (error) {
             console.error("Error:", error.message);
             return {
