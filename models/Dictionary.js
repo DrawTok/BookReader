@@ -40,6 +40,12 @@ class Dictionary extends Database {
         try {
             const connection = await this.connect();
             const resultTranslate = await this.translateWord(word);
+            //check exist word
+            const selectQuery = "SELECT * FROM dictionaries WHERE idUser = ? AND word = ?";
+            const [resultsSelect] = await connection.query(selectQuery, [idUser, word]);
+
+            if (resultsSelect.length > 0) return success;
+
             const insertQuery = "INSERT INTO dictionaries(idUser, word, meaning, sentenceContext) VALUES (?, ?, ?, ?)";
             const [results] = await connection.query(insertQuery, [idUser, word, resultTranslate.meaning, resultTranslate.sentenceContext]);
 
