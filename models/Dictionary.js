@@ -23,9 +23,20 @@ class Dictionary extends Database {
             const selectQuery = "SELECT * FROM dictionaries WHERE idUser = ?";
             const [results] = await connection.query(selectQuery, [idUser]);
 
+            //fetch data from api base on word
+            const resultsFull = await Promise.all(
+                results.map(async (item) => {
+                    const resultTranslate = await this.translateWord(item.word);
+                    return {
+                        ...item,
+                        ...resultTranslate,
+                    };
+                })
+            );
+
             return {
                 success: true,
-                data: results,
+                data: resultsFull,
             };
         } catch (error) {
             console.error("Error:", error.message);
@@ -64,6 +75,7 @@ class Dictionary extends Database {
             const response = await axios.get(`${LINK_TRANSLATE}${word}`);
             const jsonData = response.data[0];
 
+            return jsonData;
             if (!jsonData) {
                 throw new Error("No data found for the provided word.");
             }
