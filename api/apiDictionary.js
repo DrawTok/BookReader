@@ -18,4 +18,8 @@ router.delete('/deleteWord', async (req, res) => {
     await DictionaryController.deleteWord(req, res);
 });
 
+router.get('/wordIsExists', async (req, res)=>{
+    await DictionaryController.wordIsExists(req, res);
+});
+
 module.exports = router;
