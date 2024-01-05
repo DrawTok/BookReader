@@ -1,8 +1,8 @@
 const axios = require("axios");
 const linkBook = "https://gutendex.com/books/";
 const Database = require("./Database");
-const { getBookDetailById, filterAndMapBooks } = require('../utils/utilsFilterMapBook');
-
+const { getBookDetailById, filterAndMapBooks } = require("../utils/utilsFilterMapBook");
+const { IN_PROCESS } = require("../utils/constant");
 
 const success = {
     success: true,
@@ -34,9 +34,9 @@ class Book extends Database {
                         id: book.id,
                         title: book.title,
                         formats: {
-                            image: book.formats["image/jpeg"]
+                            image: book.formats["image/jpeg"],
                         },
-                        download_count: book.download_count
+                        download_count: book.download_count,
                     }))
                 );
 
@@ -106,7 +106,7 @@ class Book extends Database {
         }
     }
 
-    async getLastPageReading(idUser, idBook) {
+    async getLastPageReading(idUser) {
         try {
             const connection = await this.connect();
             const query = "SELECT lastPageReading from `libraries` WHERE idUser = ? AND idBook = ?";
@@ -114,8 +114,8 @@ class Book extends Database {
             if (results.length > 0) {
                 return {
                     success: true,
-                    result: results
-                }
+                    result: results,
+                };
             } else {
                 return fail;
             }
@@ -128,6 +128,29 @@ class Book extends Database {
         }
     }
 
+    async getLastBookReading(idUser) {
+        try {
+            const connection = await this.connect();
+            const query = `SELECT * from libraries WHERE idUser = ? AND status = '${IN_PROCESS}' ORDER BY modifiedTime DESC LIMIT 1`;
+            const [results] = await connection.query(query, [idUser]);
+            if (results.length > 0) {
+                //get book detail
+                const bookDetail = await this.getBookDetailById(results[0].idBook);
+                return {
+                    success: true,
+                    result: bookDetail,
+                };
+            } else {
+                return fail;
+            }
+        } catch (error) {
+            console.error("Error:", error.message);
+            return {
+                success: false,
+                message: "An error occurred during save reading.",
+            };
+        }
+    }
 }
 
 module.exports = new Book();
