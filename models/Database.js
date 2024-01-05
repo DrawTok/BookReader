@@ -17,10 +17,11 @@ class Database {
                 password: this.databasePassword,
                 database: this.databaseName,
             });
+            console.log("Database connected.");
             return connection;
         } catch (error) {
             console.error("Connection error: ", error.message);
-            throw error;
+            // throw error;
         }
     }
 

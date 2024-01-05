@@ -1,6 +1,6 @@
 const Database = require("../models/Database");
 const axios = require("axios");
-const LINK_TRANSLATE = require("../utils/constant");
+const { LINK_TRANSLATE } = require("../utils/constant");
 
 const success = {
     success: true,
@@ -28,7 +28,7 @@ class Dictionary extends Database {
                 results.map(async (item) => {
                     const resultTranslate = await this.translateWord(item.word);
                     return {
-                        ...item,
+                        idUser: item.idUser,
                         ...resultTranslate,
                     };
                 })
@@ -71,6 +71,7 @@ class Dictionary extends Database {
     }
 
     async translateWord(word) {
+        console.log(LINK_TRANSLATE);
         try {
             const response = await axios.get(`${LINK_TRANSLATE}${word}`);
             const jsonData = response.data[0];
