@@ -35,8 +35,8 @@ class Dictionary extends Database {
             );
 
             return {
-                success: true,
-                data: resultsFull,
+                success: false,
+                message: "Not data",
             };
         } catch (error) {
             console.error("Error:", error.message);
@@ -119,6 +119,16 @@ class Dictionary extends Database {
                 message: "An error occurred during word translation.",
             };
         }
+    }
+
+    async wordIsExists(idUser, word) {
+        const connection = await this.connect();
+        const selectQuery = "SELECT * FROM dictionaries WHERE idUser = ? AND word = ?";
+        const [resultsSelect] = await connection.query(selectQuery, [idUser, word]);
+
+        return {
+            success: resultsSelect.length > 0,
+        };
     }
 }
 
