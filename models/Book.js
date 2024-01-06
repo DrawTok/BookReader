@@ -94,9 +94,19 @@ class Book extends Database {
     async updateStatus(idUser, idBook, status) {
         try {
             const connection = await this.connect();
-            const queryUpdateStatus = "UPDATE `libraries` SET status = ? WHERE idUser = ? AND idBook = ?";
-            const [results] = await connection.query(queryUpdateStatus, [status, idUser, idBook]);
-            return results.affectedRows > 0 ? success : fail;
+            //check by bookid and userid, if exist update, else insert
+            const queryCheckExist = "SELECT * FROM `libraries` WHERE idUser = ? AND idBook = ?";
+            const [resultsCheckExist] = await connection.query(queryCheckExist, [idUser, idBook]);
+
+            if (resultsCheckExist.length > 0) {
+                const queryUpdateStatus = "UPDATE `libraries` SET status = ? WHERE idUser = ? AND idBook = ?";
+                const [results] = await connection.query(queryUpdateStatus, [status, idUser, idBook]);
+                return results.affectedRows > 0 ? success : fail;
+            } else {
+                const queryInsertStatus = "INSERT INTO `libraries` (idUser, idBook, status) VALUES (?, ?, ?)";
+                const [results] = await connection.query(queryInsertStatus, [idUser, idBook, status]);
+                return results.affectedRows > 0 ? success : fail;
+            }
         } catch (error) {
             console.error("Error:", error.message);
             return {
