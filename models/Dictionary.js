@@ -1,6 +1,6 @@
 const Database = require("../models/Database");
 const axios = require("axios");
-const LINK_TRANSLATE = require("../utils/constant");
+const { LINK_TRANSLATE } = require("../utils/constant");
 
 const success = {
     success: true,
@@ -22,22 +22,29 @@ class Dictionary extends Database {
             const connection = await this.connect();
             const selectQuery = "SELECT * FROM dictionaries WHERE idUser = ?";
             const [results] = await connection.query(selectQuery, [idUser]);
+            if (results.length > 0) {
+                //fetch data from api base on word
+                const resultsFull = await Promise.all(
+                    results.map(async (item) => {
+                        const resultTranslate = await this.translateWord(item.word);
+                        return {
+                            idUser: item.idUser,
+                            ...resultTranslate,
+                        };
+                    })
+                );
 
-            //fetch data from api base on word
-            const resultsFull = await Promise.all(
-                results.map(async (item) => {
-                    const resultTranslate = await this.translateWord(item.word);
-                    return {
-                        ...item,
-                        ...resultTranslate,
-                    };
-                })
-            );
+                return {
+                    success: true,
+                    data: resultsFull,
+                };
+            }
 
             return {
                 success: false,
                 message: "Not data",
             };
+
         } catch (error) {
             console.error("Error:", error.message);
             return {
@@ -76,7 +83,7 @@ class Dictionary extends Database {
             const jsonData = response.data[0];
 
             return jsonData;
-            if (!jsonData) {
+            /*if (!jsonData) {
                 throw new Error("No data found for the provided word.");
             }
 
@@ -95,7 +102,7 @@ class Dictionary extends Database {
                 partOfSpeech: meanings.partOfSpeech || "",
                 meaning: definitions[0]?.definition || "No definition available",
                 sentenceContext: definitions[0]?.example || "No example available",
-            };
+            };*/
         } catch (error) {
             console.error("Error:", error.message);
             return {
@@ -127,8 +134,8 @@ class Dictionary extends Database {
         const [resultsSelect] = await connection.query(selectQuery, [idUser, word]);
 
         return {
-            success: resultsSelect.length > 0,
-        };
+            success: resultsSelect.length > 0
+          };
     }
 }
 

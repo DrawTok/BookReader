@@ -106,7 +106,7 @@ class Book extends Database {
         }
     }
 
-    async getLastPageReading(idUser) {
+    async getLastPageReading(idUser, idBook) {
         try {
             const connection = await this.connect();
             const query = "SELECT lastPageReading from `libraries` WHERE idUser = ? AND idBook = ?";

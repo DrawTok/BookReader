@@ -5,7 +5,6 @@ const { filterAndMapBooks } = require('../utils/utilsFilterMapBook');
 class Category extends Database {
     constructor() {
         super();
-        Object.assign(this, Database)
     }
 
     async addNewCategory(idCategory, name) {
