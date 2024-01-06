@@ -1,4 +1,3 @@
-
 const category = require("../models/Category");
 
 class CategoryController {
@@ -34,8 +33,7 @@ class CategoryController {
         }
     }
 
-
-    getTrending(req, res){
+    getTrending(req, res) {
         try {
             category
                 .getTrending()
@@ -125,7 +123,7 @@ class CategoryController {
 
             // Use await to wait for the asynchronous operation to complete
             category
-                .addFavoriteCategory(idUser, favCatIds)
+                .addCategoryFavorite(idUser, favCatIds)
                 .then((result) => {
                     res.json(result);
                 })
