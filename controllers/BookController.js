@@ -28,13 +28,13 @@ class BookController {
     }
 
     getLastPageReading(req, res) {
-        const { idUser } = req.params;
+        const { idUser, idBook } = req.params;
         if (!idUser) {
             this.handleError(res, "Missing input parameters...");
             return;
         }
 
-        book.getLastPageReading(idUser)
+        book.getLastPageReading(idUser, idBook)
             .then((result) => res.json(result))
             .catch((error) => this.handleError(res, error.errorMessage));
     }
