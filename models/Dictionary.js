@@ -133,7 +133,7 @@ class Dictionary extends Database {
         const [resultsSelect] = await connection.query(selectQuery, [idUser, word]);
 
         return {
-            success: resultsSelect.length > 0,
+            success: resultsSelect.length > 0
         };
     }
 }

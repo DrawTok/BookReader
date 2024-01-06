@@ -18,7 +18,7 @@ router.delete("/deleteWord", async (req, res) => {
     await DictionaryController.deleteWord(req, res);
 });
 
-router.post("/wordIsExists", async (req, res) => {
+router.post('/wordIsExists', async (req, res)=>{
     await DictionaryController.wordIsExists(req, res);
 });
 
