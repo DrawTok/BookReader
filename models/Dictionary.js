@@ -42,9 +42,8 @@ class Dictionary extends Database {
 
             return {
                 success: false,
-                message: 'Not data'
+                message: "No data",
             };
-
         } catch (error) {
             console.error("Error:", error.message);
             return {
@@ -135,8 +134,7 @@ class Dictionary extends Database {
 
         return {
             success: resultsSelect.length > 0
-          };
-          
+        };
     }
 }
 

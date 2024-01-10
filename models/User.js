@@ -1,4 +1,4 @@
-
+const { validate } = require("email-validator");
 const Database = require("./Database");
 const crypto = require("crypto");
 
@@ -17,8 +17,7 @@ class User extends Database {
             const query = "SELECT email, fullName, birthDay, role FROM users WHERE idUser = ?";
             const [results] = await connection.query(query, [idUser]);
 
-            if (results.length > 0)
-                return { success: true, userData: results[0] };
+            if (results.length > 0) return { success: true, userData: results[0] };
             else return { success: false, message: "User not found" };
         } catch (error) {
             console.error("Error get info user: ", error.message);
@@ -46,10 +45,7 @@ class User extends Database {
 
             const hashedPassword = userData[0].password;
 
-            const inputPasswordHash = await crypto
-                .createHash("sha256")
-                .update(password)
-                .digest("hex");
+            const inputPasswordHash = await crypto.createHash("sha256").update(password).digest("hex");
 
             const isPasswordMatch = inputPasswordHash === hashedPassword;
 
@@ -78,7 +74,7 @@ class User extends Database {
 
             const [emailExists] = await connection.query("SELECT COUNT(email) as count FROM users WHERE email = ?", [email]);
 
-            return emailExists[0].count > 0 ? true : false
+            return emailExists[0].count > 0 ? true : false;
         } catch (error) {
             console.error("Error checking email existence: ", error.message);
             throw error;
@@ -94,7 +90,7 @@ class User extends Database {
         try {
             connection = await this.connect();
 
-            if (!emailValidator.validate(email)) {
+            if (!validate(email)) {
                 return { success: false, error: "Invalid email format..." };
             }
 
@@ -104,19 +100,10 @@ class User extends Database {
                 return { success: false, error: "Email already exists..." };
             }
 
-            const hashedPassword = await crypto
-                .createHash("sha256")
-                .update(password)
-                .digest("hex");
+            const hashedPassword = await crypto.createHash("sha256").update(password).digest("hex");
 
             const query = "INSERT INTO users (email, fullName, birthDay, password, role) VALUES (?, ?, ?, ?, ?)";
-            const [results] = await connection.query(query, [
-                email,
-                fullName,
-                birthDay,
-                hashedPassword,
-                role,
-            ]);
+            const [results] = await connection.query(query, [email, fullName, birthDay, hashedPassword, role]);
 
             const queryGet = "SELECT * FROM users WHERE email = ?";
             const [userData] = await connection.query(queryGet, [email]);
@@ -164,30 +151,17 @@ class User extends Database {
         try {
             connection = await this.connect();
 
-            const queryOldPassword =
-                "SELECT password FROM users WHERE idUser = ?";
-            const [oldPasswordRows] = await connection.query(queryOldPassword, [
-                idUser,
-            ]);
+            const queryOldPassword = "SELECT password FROM users WHERE idUser = ?";
+            const [oldPasswordRows] = await connection.query(queryOldPassword, [idUser]);
             const oldPassword = oldPasswordRows[0]?.password;
 
-            const curPasswordHash = crypto
-                .createHash("sha256")
-                .update(curPassword)
-                .digest("hex");
+            const curPasswordHash = crypto.createHash("sha256").update(curPassword).digest("hex");
 
             const passwordMatch = curPasswordHash === oldPassword;
             if (passwordMatch) {
-                const hashedPassword = await crypto
-                    .createHash("sha256")
-                    .update(newPassword)
-                    .digest("hex");
-                const queryUpdatePassword =
-                    "UPDATE users SET password = ? WHERE idUser = ?";
-                const [results] = await connection.query(queryUpdatePassword, [
-                    hashedPassword,
-                    idUser,
-                ]);
+                const hashedPassword = await crypto.createHash("sha256").update(newPassword).digest("hex");
+                const queryUpdatePassword = "UPDATE users SET password = ? WHERE idUser = ?";
+                const [results] = await connection.query(queryUpdatePassword, [hashedPassword, idUser]);
 
                 if (results.affectedRows > 0) {
                     return { success: true, message: "Successful" };
@@ -220,24 +194,23 @@ class User extends Database {
             let query;
 
             if (!existingRecord.length) {
-                query = 'INSERT INTO active_key (email, code, time) VALUES (?, ?, ?)';
+                query = "INSERT INTO active_key (email, code, time) VALUES (?, ?, ?)";
                 const values = [email, code, curSeconds];
 
                 await connection.query(query, values);
-                console.log('Inserted into active_key successfully');
+                console.log("Inserted into active_key successfully");
             } else {
                 query = "UPDATE active_key SET code = ?, time = ? WHERE email = ?";
 
                 await connection.query(query, [code, curSeconds, email]);
-                console.log('Updated active_key successfully');
+                console.log("Updated active_key successfully");
             }
 
             connection.end();
         } catch (error) {
-            console.error('Error inserting/updating into active_key:', error);
+            console.error("Error inserting/updating into active_key:", error);
         }
     }
-
 
     async authOTP(email, otp) {
         const connection = await this.connect();
@@ -250,13 +223,13 @@ class User extends Database {
             if (timeRemaining <= 120 && timeRemaining >= 0) {
                 return {
                     success: true,
-                    message: "OTP authentication successful."
-                }
+                    message: "OTP authentication successful.",
+                };
             } else
                 return {
                     success: false,
-                    message: "OTP has expired."
-                }
+                    message: "OTP has expired.",
+                };
         }
         return {
             success: false,
@@ -271,15 +244,9 @@ class User extends Database {
             const query = "SELECT code FROM active_key WHERE email = ?";
             const [resultOTP] = await connection.query(query, [email]);
             if (resultOTP[0]?.code === otp) {
-                const hashedPassword = await crypto
-                    .createHash("sha256")
-                    .update(newPassword)
-                    .digest("hex");
+                const hashedPassword = await crypto.createHash("sha256").update(newPassword).digest("hex");
 
-                const [resultUpdatePassword] = await connection.query(
-                    "UPDATE users SET password = ? WHERE email = ?",
-                    [hashedPassword, email]
-                );
+                const [resultUpdatePassword] = await connection.query("UPDATE users SET password = ? WHERE email = ?", [hashedPassword, email]);
 
                 connection.end();
 
@@ -299,10 +266,9 @@ class User extends Database {
                 console.error("Error resetting password:", error.message);
                 return {
                     success: false,
-                    message: "An error occurred during password reset."
+                    message: "An error occurred during password reset.",
                 };
             }
-
         } catch (error) {
             console.error("Error resetting password:", error.message);
             return {
@@ -320,12 +286,12 @@ class User extends Database {
             const [result] = await connection.query(query, [email]);
 
             if (result.affectedRows > 0) {
-                console.log('Deleted active key successfully');
+                console.log("Deleted active key successfully");
             } else {
-                console.log('No active key found for the specified email');
+                console.log("No active key found for the specified email");
             }
         } catch (error) {
-            console.error('Error deleting active key:', error);
+            console.error("Error deleting active key:", error);
         } finally {
             connection.end();
         }
