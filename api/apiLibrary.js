@@ -10,4 +10,8 @@ router.get("/getBookByStatus/:idUser/:status", async (req, res) => {
     await LibraryController.getBookByStatus(req, res);
 });
 
+router.delete("/deleteBookmark/", async (req, res) => {
+    await LibraryController.deleteBookmark(req, res);
+});
+
 module.exports = router;

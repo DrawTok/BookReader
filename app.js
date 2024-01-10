@@ -12,11 +12,13 @@ const apiAccount = require("./api/apiAccount");
 const apiCategory = require("./api/apiCategory");
 const apiLibrary = require("./api/apiLibrary");
 const apiDictionary = require("./api/apiDictionary");
+const apiChallenges = require("./api/apiChallenges");
 
 app.use("/api/", apiBook);
 app.use("/api/", apiAccount);
 app.use("/api/", apiCategory);
 app.use("/api/", apiLibrary);
 app.use("/api/", apiDictionary);
+app.use("/api/", apiChallenges);
 
 module.exports = app;

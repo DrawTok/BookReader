@@ -89,6 +89,26 @@ class Library extends Database {
             };
         }
     }
+
+    async deleteBookmark(idUser, idBook) {
+        try {
+            const connection = await this.connect();
+            const queryDelete = "DELETE FROM libraries WHERE idUser = ? AND idBook = ?";
+            const [results] = await connection.query(queryDelete, [idUser, idBook]);
+            const isAffectedRow = results.affectedRows > 0;
+            return {
+                success: isAffectedRow,
+                message: isAffectedRow ? 'Successful' : 'No data'
+            }
+
+        } catch (error) {
+            console.error("Error:", error.message);
+            return {
+                success: false,
+                message: "An error occurred during save reading.",
+            };
+        }
+    }
 }
 
 module.exports = new Library();

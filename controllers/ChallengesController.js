@@ -1,0 +1,90 @@
+
+const Challenges = require('../models/Challenges');
+const { json } = require('body-parser');
+
+class ChallengesController {
+    createNewChallenge(req, res) {
+        const { idUser, name, description, startDate, endDate } = req.body;
+        if (!idUser || !name || !description
+            || !startDate || !endDate) {
+            return res.json({
+                success: false,
+                error: "Missing input parameters..."
+            });
+        }
+
+        Challenges.createNewChallenge(idUser, name, description, startDate, endDate)
+            .then(result => res.json(result))
+            .catch((error) => {
+                console.error('An error occurred:', error);
+                res.json({
+                    success: false,
+                    error: 'An error occurred. ' + error
+                });
+            });
+    }
+
+    updateChallenge(req, res) {
+        const { idChallenge, name, description, startDate, endDate } = req.body;
+        if (!idChallenge || !name || !description
+            || !startDate || !endDate) {
+            return res.json({
+                success: false,
+                error: "Missing input parameters..."
+            });
+        }
+
+        Challenges.updateChallenges(idChallenge, name, description, startDate, endDate)
+            .then(result => res.json(result))
+            .catch(error => {
+                console.error('An error at updated occurred:', error);
+                res.json({
+                    success: false,
+                    error: 'An error occurred. ' + error
+                });
+            });
+    }
+
+    deleteChallenge(req, res) {
+        const { idUser, idChallenge } = req.body;
+        if (!idUser || !idChallenge) {
+            return res.json({
+                success: false,
+                error: "Missing input parameters..."
+            });
+        }
+
+        Challenges.deleteChallenge(idUser, idChallenge)
+            .then(result => res.json(result))
+            .catch(error => {
+                console.error('An error at delete occurred:', error);
+                res.json({
+                    success: false,
+                    error: 'An error occurred. ' + error
+                });
+            });
+    }
+
+    getChallenge(req, res) {
+        const { idUser, idChallenge } = req.body;
+        if (!idUser || !idChallenge) {
+            return res.json({
+                success: false,
+                error: "Missing input parameters..."
+            });
+        }
+
+        Challenges.getChallenge(idUser, idChallenge)
+            .then(result => res.json(result))
+            .catch(error => {
+                console.error('An error at get occurred:', error);
+                res.json({
+                    success: false,
+                    error: 'An error occurred. ' + error
+                });
+            });
+    }
+
+}
+
+module.exports = new ChallengesController();
