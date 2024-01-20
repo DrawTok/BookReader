@@ -64,6 +64,7 @@ class ChallengesController {
 
     deleteChallenge(req, res) {
         const { idUser, idChallenge } = req.body;
+        console.log(idUser, idChallenge);
         if (!idUser || !idChallenge) {
             return res.json({
                 success: false,
