@@ -24,7 +24,7 @@ class ChallengesController {
 
     createNewChallenge(req, res) {
         const { idUser, name, description, startDate, endDate, target } = req.body;
-        if (!idUser || !name || !description || !startDate || !endDate || !target) {
+        if (!idUser || !name || !startDate || !endDate || !target) {
             return res.json({
                 success: false,
                 error: "Missing input parameters...",
@@ -64,7 +64,6 @@ class ChallengesController {
 
     deleteChallenge(req, res) {
         const { idUser, idChallenge } = req.body;
-        console.log(idUser, idChallenge);
         if (!idUser || !idChallenge) {
             return res.json({
                 success: false,
