@@ -8,7 +8,7 @@ class Challenges extends Database {
     async getAllChallenges(idUser) {
         const connection = await this.connect();
         const querySelect = `
-        SELECT C.name, C.startDate, C.endDate, C.target,
+        SELECT C.idChallenge, C.name, C.startDate, C.endDate, C.target,
             (SELECT COUNT(idBook)
             FROM libraries
             WHERE modifiedTime BETWEEN
