@@ -1,7 +1,7 @@
 const Database = require("./Database");
 const axios = require("axios");
 const linkBook = "https://gutendex.com/books/";
-const { filterAndMapBooks } = require('../utils/utilsFilterMapBook');
+const { filterAndMapBooks } = require("../utils/utilsFilterMapBook");
 class Category extends Database {
     constructor() {
         super();
@@ -102,6 +102,10 @@ class Category extends Database {
 
             const listFavCatId = dataIdFavorite.map((categoryId) => [idUser, categoryId]);
 
+            //delete all favorite category of user
+            const queryDelete = "DELETE FROM `favourites_cat` WHERE idUser = ?";
+            await connection.query(queryDelete, [idUser]);
+
             const query = "INSERT INTO `favourites_cat`(idUser, idCategory) VALUES ?";
             const [result] = await connection.query(query, [listFavCatId]);
 
@@ -169,7 +173,6 @@ class Category extends Database {
             }
         }
     }
-
 }
 
 module.exports = new Category();
