@@ -181,19 +181,16 @@ class AccountController {
                 });
             }
 
-            if (!user.isExistsEmail()) {
-                return res.json({
-                    success: false,
-                    error: "Account does not exist"
-                });
-            }
-
             const otp = randomString.generate({
                 length: 6,
                 charset: "numeric",
             });
 
-            user.insertIntoActiveKey(email, otp);
+            user.insertIntoActiveKey(email, otp).then(result => {
+                if (!result.success) {
+                    return res.json({ result });
+                }
+            });
 
             const mailOptions = {
                 from: "bookreadertlu3@gmail.com",
