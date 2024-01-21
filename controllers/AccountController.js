@@ -181,6 +181,13 @@ class AccountController {
                 });
             }
 
+            if (!user.isExistsEmail()) {
+                return res.json({
+                    success: false,
+                    error: "Account does not exist"
+                });
+            }
+
             const otp = randomString.generate({
                 length: 6,
                 charset: "numeric",

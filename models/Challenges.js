@@ -6,13 +6,13 @@ class Challenges extends Database {
         super();
     }
 
-    async createNewChallenge(idUser, name, description, startDate, endDate) {
+    async createNewChallenge(idUser, name, description, startDate, endDate, target) {
 
         const connection = await this.connect();
         const queryInsert =
-            "INSERT INTO challenges(idUser, name, description, startDate, endDate) VALUES (?, ?, ?, ? ,?)";
+            "INSERT INTO challenges(idUser, name, description, startDate, endDate, target) VALUES (?, ?, ?, ? ,?, ?)";
 
-        const [results] = await connection.query(queryInsert, [idUser, name, description, startDate, endDate]);
+        const [results] = await connection.query(queryInsert, [idUser, name, description, startDate, endDate, target]);
 
         const isAffectedRow = results.affectedRows > 0;
 
@@ -22,14 +22,14 @@ class Challenges extends Database {
         }
     }
 
-    async updateChallenges(idChallenge, name, description, startDate, endDate) {
+    async updateChallenges(idChallenge, name, description, startDate, endDate, target) {
         try {
-            console.log(idChallenge, name, description, startDate, endDate);
+            console.log(idChallenge, name, description, startDate, endDate, target);
             const connection = await this.connect();
             const queryUpdate =
-                "UPDATE challenges SET name = ?, description = ?, startDate = ?, endDate = ? WHERE idChallenge = ?";
+                "UPDATE challenges SET name = ?, description = ?, startDate = ?, endDate = ? , target = ? WHERE idChallenge = ?";
 
-            const [resultUpdate] = await connection.query(queryUpdate, [name, description, startDate, endDate, idChallenge]);
+            const [resultUpdate] = await connection.query(queryUpdate, [name, description, startDate, endDate, idChallenge, target]);
 
             const isAffectedRow = resultUpdate.affectedRows > 0;
             return {
@@ -62,7 +62,7 @@ class Challenges extends Database {
             const connection = await this.connect();
 
             const combinedQuery = `
-            SELECT COUNT(libraries.idLib) AS quantity
+            SELECT name, description, startDate, endDate, COUNT(libraries.idLib) AS quantity
             FROM challenges
             LEFT JOIN libraries ON 
                 libraries.modifiedTime BETWEEN 

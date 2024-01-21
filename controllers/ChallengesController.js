@@ -4,16 +4,16 @@ const { json } = require('body-parser');
 
 class ChallengesController {
     createNewChallenge(req, res) {
-        const { idUser, name, description, startDate, endDate } = req.body;
+        const { idUser, name, description, startDate, endDate, target } = req.body;
         if (!idUser || !name || !description
-            || !startDate || !endDate) {
+            || !startDate || !endDate || !target) {
             return res.json({
                 success: false,
                 error: "Missing input parameters..."
             });
         }
 
-        Challenges.createNewChallenge(idUser, name, description, startDate, endDate)
+        Challenges.createNewChallenge(idUser, name, description, startDate, endDate, target)
             .then(result => res.json(result))
             .catch((error) => {
                 console.error('An error occurred:', error);
@@ -25,16 +25,16 @@ class ChallengesController {
     }
 
     updateChallenge(req, res) {
-        const { idChallenge, name, description, startDate, endDate } = req.body;
+        const { idChallenge, name, description, startDate, endDate, target } = req.body;
         if (!idChallenge || !name || !description
-            || !startDate || !endDate) {
+            || !startDate || !endDate || !target) {
             return res.json({
                 success: false,
                 error: "Missing input parameters..."
             });
         }
 
-        Challenges.updateChallenges(idChallenge, name, description, startDate, endDate)
+        Challenges.updateChallenges(idChallenge, name, description, startDate, endDate, target)
             .then(result => res.json(result))
             .catch(error => {
                 console.error('An error at updated occurred:', error);
