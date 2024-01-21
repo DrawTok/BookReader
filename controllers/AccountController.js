@@ -276,6 +276,35 @@ class AccountController {
                 });
             });
     }
+
+    changePassword(req, res) {
+        const { idUser, curPassword, newPassword, rePassword } = req.body;
+        if (!idUser || !curPassword || !newPassword || !rePassword) {
+            return res.json({
+                success: false,
+                error: "Missing input parameters...",
+            });
+        }
+
+        if (rePassword !== newPassword) {
+            return res.json({
+                success: false,
+                error: "The two passwords are not the same.",
+            });
+        }
+
+        user.updatePassword(idUser, curPassword, newPassword)
+            .then((result) => {
+                res.json(result);
+            })
+            .catch((error) => {
+                console.error("An error occurred:", error);
+                res.json({
+                    success: false,
+                    error: "An error occurred while processing the request.",
+                });
+            });
+    }
 }
 
 module.exports = new AccountController();
