@@ -71,6 +71,18 @@ class BookController {
             .catch((error) => this.handleError(res, error.errorMessage));
     }
 
+    getBookmark(req, res) {
+        const { idUser, idBook } = req.params;
+        if (!idUser || !idBook) {
+            this.handleError(res, "Missing input parameters...");
+            return;
+        }
+
+        book.getBookmark(idUser, idBook)
+            .then((result) => res.json(result))
+            .catch((error) => this.handleError(res, error.errorMessage));
+    }
+
     handleError(res, errorMessage) {
         console.error("An error occurred:", errorMessage);
         res.json({

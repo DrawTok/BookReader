@@ -26,4 +26,8 @@ router.get("/getLastBookRead/:idUser", async (req, res) => {
     await BookController.getLastBookRead(req, res);
 });
 
+router.get("/getBookmark/:idUser/:idBook", async (req, res) => {
+    await BookController.getBookmark(req, res);
+});
+
 module.exports = router;
