@@ -3,11 +3,12 @@ const Database = require("./Database");
 const crypto = require("crypto");
 
 const curSeconds = Math.floor(new Date().getTime() / 1000);
-
 class User extends Database {
     constructor() {
         super();
     }
+
+
 
     async getInfo(idUser) {
         let connection;
@@ -29,10 +30,16 @@ class User extends Database {
         }
     }
 
+
     async authLogin(email, password) {
         let connection;
         try {
             connection = await this.connect();
+
+            if (!validate(email)) {
+                return { success: false, error: "Invalid email format" };
+            }
+
 
             // Check if the email exists
             const isExistsEmail = await this.isExistsEmail(email);
@@ -66,6 +73,7 @@ class User extends Database {
             }
         }
     }
+
 
     async isExistsEmail(email) {
         let connection;
@@ -186,7 +194,7 @@ class User extends Database {
 
     async insertIntoActiveKey(email, code) {
 
-        if(!await this.isExistsEmail(email)){
+        if (!await this.isExistsEmail(email)) {
             return {
                 success: false,
                 message: "Account does not exist"
