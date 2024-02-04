@@ -1,5 +1,4 @@
 const Challenges = require("../models/Challenges");
-const { json } = require("body-parser");
 
 class ChallengesController {
     getAllChallenges(req, res) {
@@ -54,7 +53,7 @@ class ChallengesController {
         Challenges.updateChallenges(idChallenge, name, description, startDate, endDate, target)
             .then((result) => res.json(result))
             .catch((error) => {
-                console.error("An error at updated occurred:", error);
+                console.error("An error at update occurred:", error);
                 res.json({
                     success: false,
                     error: "An error occurred. " + error,

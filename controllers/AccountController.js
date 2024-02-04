@@ -186,7 +186,11 @@ class AccountController {
                 charset: "numeric",
             });
 
-            user.insertIntoActiveKey(email, otp);
+            user.insertIntoActiveKey(email, otp).then(result => {
+                if (!result.success) {
+                    return res.json({ result });
+                }
+            });
 
             const mailOptions = {
                 from: "bookreadertlu3@gmail.com",

@@ -185,6 +185,14 @@ class User extends Database {
     }
 
     async insertIntoActiveKey(email, code) {
+
+        if(!await this.isExistsEmail(email)){
+            return {
+                success: false,
+                message: "Account does not exist"
+            }
+        }
+
         const connection = await this.connect();
 
         try {
