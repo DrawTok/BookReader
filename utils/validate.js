@@ -12,6 +12,13 @@ const userValidationRules = {
         check("password").not().isEmpty().withMessage("Password is required."),
         check("password").isLength({ min: 8 }).withMessage("Password must be at least 8 characters long."),
         check("password").matches(/[\W_]/).withMessage("Password must contain at least one special character."),
+        check("password").matches(/[a-z]/).withMessage("Password must contain at least one lowercase letter."),
+        check("password").matches(/[A-Z]/).withMessage("Password must contain at least one uppercase letter."),
+        check("password").matches(/[0-9]/).withMessage("Password must contain at least one number."),
+        check("rePassword").not().isEmpty().withMessage("Please re-enter your password."),
+        check("rePassword")
+            .custom((value, { req }) => value === req.body.password)
+            .withMessage("The two passwords do not match."),
     ],
 };
 
