@@ -35,12 +35,6 @@ class User extends Database {
         let connection;
         try {
             connection = await this.connect();
-
-            if (!validate(email)) {
-                return { success: false, error: "Invalid email format" };
-            }
-
-
             // Check if the email exists
             const isExistsEmail = await this.isExistsEmail(email);
 
@@ -97,10 +91,6 @@ class User extends Database {
         let connection;
         try {
             connection = await this.connect();
-
-            if (!validate(email)) {
-                return { success: false, error: "Invalid email format..." };
-            }
 
             const [countEmails] = await connection.query("SELECT COUNT(*) AS count FROM users WHERE email = ?", [email]);
 

@@ -1,6 +1,10 @@
 const nodemailer = require("nodemailer");
 const user = require("../models/User");
 const randomString = require("randomstring");
+const { validateRegistration,
+    validateLogin,
+    checkPassword } = require("../utils/validate");
+const { json } = require("body-parser");
 
 const transporter = nodemailer.createTransport({
     host: "mail.openjavascript.info",
@@ -24,14 +28,14 @@ class AccountController {
                 });
             }
 
-            if (password !== rePassword) {
-                return res.json({
-                    success: false,
-                    error: "The two passwords are not the same.",
-                });
-            }
+            const name = fullName.trim();
+            const formattedEmail = email.trim().toLowerCase();
 
-            user.createUser(email, fullName, birthDay || new Date(2000, 1, 1), password, role || "user")
+            const error = validateRegistration(name, formattedEmail, password, rePassword);
+            if (!error.success) {
+                return res.json(error);
+            }
+            user.createUser(formattedEmail, name, birthDay || new Date(2000, 1, 1), password, role || "user")
                 .then((result) => {
                     res.json(result);
                 })
@@ -120,6 +124,17 @@ class AccountController {
                     error: "Missing input parameters...",
                 });
             }
+
+            const error = checkPassword(newPassword);
+            if (error) {
+                return res.json(
+                    {
+                        success: false,
+                        error: error
+                    }
+                )
+            }
+
             user.updatePassword(idUser, curPassword, newPassword)
                 .then((result) => {
                     res.json(result);
@@ -149,6 +164,11 @@ class AccountController {
                     success: false,
                     error: "Missing input parameters...",
                 });
+            }
+
+            const error = validateLogin(email);
+            if (!error.success) {
+                return res.json(error);
             }
 
             user.authLogin(email, password)
@@ -225,10 +245,17 @@ class AccountController {
 
     authOTP(req, res) {
         const { email, otp } = req.body;
-        if (!email || !otp) {
+        if (!email) {
             return res.json({
                 success: false,
                 error: "Missing input parameters...",
+            });
+        }
+
+        if (!otp) {
+            return res.json({
+                success: false,
+                error: "OTP cannot be blank...",
             });
         }
 
@@ -252,6 +279,16 @@ class AccountController {
                 success: false,
                 error: "Missing input parameters...",
             });
+        }
+
+        const error = checkPassword(newPassword);
+        if (error) {
+            return res.json(
+                {
+                    success: false,
+                    error: error
+                }
+            )
         }
 
         if (rePassword !== newPassword) {
@@ -281,6 +318,16 @@ class AccountController {
                 success: false,
                 error: "Missing input parameters...",
             });
+        }
+
+        const error = checkPassword(newPassword);
+        if (error) {
+            return res.json(
+                {
+                    success: false,
+                    error: error
+                }
+            )
         }
 
         if (rePassword !== newPassword) {
