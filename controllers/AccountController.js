@@ -1,59 +1,56 @@
-const nodemailer = require('nodemailer');
+const nodemailer = require("nodemailer");
 const user = require("../models/User");
-const randomString = require('randomstring');
+const randomString = require("randomstring");
+const { validateRegistration,
+    validateLogin,
+    checkPassword } = require("../utils/validate");
+const { json } = require("body-parser");
 
 const transporter = nodemailer.createTransport({
-    host: 'mail.openjavascript.info',
+    host: "mail.openjavascript.info",
     port: 465,
     service: true,
-    service: 'gmail',
+    service: "gmail",
     auth: {
-        user: 'bookreadertlu3@gmail.com',
-        pass: 'iheb ndhu kspq dnom'
-    }
+        user: "bookreadertlu3@gmail.com",
+        pass: "iheb ndhu kspq dnom",
+    },
 });
 
 class AccountController {
-
-
     registerUser(req, res) {
         try {
             const { email, fullName, birthDay, password, rePassword, role } = req.body;
             if (!email || !fullName | !password || !rePassword) {
                 return res.json({
                     success: false,
-                    error: "Missing input parameters..."
+                    error: "Missing input parameters...",
                 });
             }
 
-            if (password !== rePassword) {
-                return res.json({
-                    success: false,
-                    error: "The two passwords are not the same.",
-                });
+            const name = fullName.trim();
+            const formattedEmail = email.trim().toLowerCase();
+
+            const error = validateRegistration(name, formattedEmail, password, rePassword);
+            if (!error.success) {
+                return res.json(error);
             }
-
-            user.createUser(
-                email,
-                fullName,
-                birthDay,
-                password,
-                role || "user"
-            ).then(result => {
-                res.json(result);
-
-            }).catch(error => {
-                console.error('An error occurred:', error);
-                res.json({
-                    success: false,
-                    error: user.message
+            user.createUser(formattedEmail, name, birthDay || new Date(2000, 1, 1), password, role || "user")
+                .then((result) => {
+                    res.json(result);
+                })
+                .catch((error) => {
+                    console.error("An error occurred:", error);
+                    res.json({
+                        success: false,
+                        error: user.message,
+                    });
                 });
-            });
         } catch (error) {
-            console.error('An error occurred:', error);
+            console.error("An error occurred:", error);
             res.json({
                 success: false,
-                error: 'An error occurred while processing the request.'
+                error: "An error occurred while processing the request.",
             });
         }
     }
@@ -64,23 +61,25 @@ class AccountController {
             if (!idUser) {
                 return res.json({
                     success: false,
-                    error: 'Missing input parameters...'
+                    error: "Missing input parameters...",
                 });
             }
-            user.getInfo(idUser).then(result => {
-                res.json(result);
-            }).catch(error => {
-                console.error('An error occurred:', error);
-                res.json({
-                    success: false,
-                    error: user.message
+            user.getInfo(idUser)
+                .then((result) => {
+                    res.json(result);
+                })
+                .catch((error) => {
+                    console.error("An error occurred:", error);
+                    res.json({
+                        success: false,
+                        error: user.message,
+                    });
                 });
-            });
         } catch (error) {
-            console.error('An error occurred:', error);
+            console.error("An error occurred:", error);
             res.json({
                 success: false,
-                error: 'An error occurred while processing the request.'
+                error: "An error occurred while processing the request.",
             });
         }
     }
@@ -92,23 +91,25 @@ class AccountController {
             if (!idUser || !email || !fullName || !birthDay || !role) {
                 return res.json({
                     success: false,
-                    error: 'Missing input parameters...'
+                    error: "Missing input parameters...",
                 });
             }
-            user.updateUser(idUser, email, fullName, birthDay, role).then(result => {
-                res.json(result);
-            }).catch(error => {
-                console.error('An error occurred:', error);
-                res.json({
-                    success: false,
-                    error: user.message
+            user.updateUser(idUser, email, fullName, birthDay, role)
+                .then((result) => {
+                    res.json(result);
+                })
+                .catch((error) => {
+                    console.error("An error occurred:", error);
+                    res.json({
+                        success: false,
+                        error: user.message,
+                    });
                 });
-            });
         } catch (error) {
-            console.error('An error occurred:', error);
+            console.error("An error occurred:", error);
             res.json({
                 success: false,
-                error: 'An error occurred while processing the request.'
+                error: "An error occurred while processing the request.",
             });
         }
     }
@@ -120,23 +121,36 @@ class AccountController {
             if (!idUser || !curPassword || !newPassword) {
                 return res.json({
                     success: false,
-                    error: 'Missing input parameters...'
+                    error: "Missing input parameters...",
                 });
             }
-            user.updatePassword(idUser, curPassword, newPassword).then(result => {
-                res.json(result);
-            }).catch(error => {
-                console.error('An error occurred:', error);
-                res.json({
-                    success: false,
-                    error: user.message
+
+            const error = checkPassword(newPassword);
+            if (error) {
+                return res.json(
+                    {
+                        success: false,
+                        error: error
+                    }
+                )
+            }
+
+            user.updatePassword(idUser, curPassword, newPassword)
+                .then((result) => {
+                    res.json(result);
+                })
+                .catch((error) => {
+                    console.error("An error occurred:", error);
+                    res.json({
+                        success: false,
+                        error: user.message,
+                    });
                 });
-            });
         } catch (error) {
-            console.error('An error occurred:', error);
+            console.error("An error occurred:", error);
             res.json({
                 success: false,
-                error: 'An error occurred while processing the request.'
+                error: "An error occurred while processing the request.",
             });
         }
     }
@@ -148,25 +162,31 @@ class AccountController {
             if (!email || !password) {
                 return res.json({
                     success: false,
-                    error: "Missing input parameters..."
+                    error: "Missing input parameters...",
                 });
             }
 
-            user.authLogin(email, password).then(result => {
-                res.json(result);
-            }).catch(error => {
-                console.error('An error occurred:', error);
-                res.json({
-                    success: false,
-                    error: user.message
-                });
-            });
+            const error = validateLogin(email);
+            if (!error.success) {
+                return res.json(error);
+            }
 
+            user.authLogin(email, password)
+                .then((result) => {
+                    res.json(result);
+                })
+                .catch((error) => {
+                    console.error("An error occurred:", error);
+                    res.json({
+                        success: false,
+                        error: user.message,
+                    });
+                });
         } catch (error) {
-            console.error('An error occurred:', error);
+            console.error("An error occurred:", error);
             res.json({
                 success: false,
-                error: 'An error occurred while processing the request.'
+                error: "An error occurred while processing the request.",
             });
         }
     }
@@ -177,22 +197,26 @@ class AccountController {
             if (!email) {
                 return res.json({
                     success: false,
-                    error: 'Missing input parameters...'
+                    error: "Missing input parameters...",
                 });
             }
 
             const otp = randomString.generate({
                 length: 6,
-                charset: 'numeric'
+                charset: "numeric",
             });
 
-            user.insertIntoActiveKey(email, otp);
+            user.insertIntoActiveKey(email, otp).then(result => {
+                if (!result.success) {
+                    return res.json({ result });
+                }
+            });
 
             const mailOptions = {
-                from: 'bookreadertlu3@gmail.com',
+                from: "bookreadertlu3@gmail.com",
                 to: email,
-                subject: 'Reset Password OTP',
-                text: `Your OTP for password reset is: ${otp}`
+                subject: "Reset Password OTP",
+                text: `Your OTP for password reset is: ${otp}`,
             };
 
             transporter.sendMail(mailOptions, (error, info) => {
@@ -200,44 +224,52 @@ class AccountController {
                     console.error(error);
                     res.json({
                         success: false,
-                        error: 'Failed to send OTP email'
+                        error: "Failed to send OTP email",
                     });
                 } else {
-                    console.log('Email sent: ' + info.response);
+                    console.log("Email sent: " + info.response);
                     res.json({
                         success: true,
-                        message: 'OTP sent successfully'
+                        message: "OTP sent successfully",
                     });
                 }
             });
         } catch (error) {
-            console.error('An error occurred:', error);
+            console.error("An error occurred:", error);
             res.json({
                 success: false,
-                error: 'An error occurred while processing the request.'
+                error: "An error occurred while processing the request.",
             });
         }
     }
 
     authOTP(req, res) {
-
         const { email, otp } = req.body;
-        if (!email || !otp) {
+        if (!email) {
             return res.json({
                 success: false,
-                error: 'Missing input parameters...'
+                error: "Missing input parameters...",
             });
         }
 
-        user.authOTP(email, otp).then(result => {
-            res.json(result);
-        }).catch(error => {
-            console.error('An error occurred:', error);
-            res.json({
+        if (!otp) {
+            return res.json({
                 success: false,
-                error: user.message
+                error: "OTP cannot be blank...",
             });
-        });
+        }
+
+        user.authOTP(email, otp)
+            .then((result) => {
+                res.json(result);
+            })
+            .catch((error) => {
+                console.error("An error occurred:", error);
+                res.json({
+                    success: false,
+                    error: user.message,
+                });
+            });
     }
 
     resetPassword(req, res) {
@@ -245,8 +277,18 @@ class AccountController {
         if (!email || !newPassword || !otp || !rePassword) {
             return res.json({
                 success: false,
-                error: 'Missing input parameters...'
+                error: "Missing input parameters...",
             });
+        }
+
+        const error = checkPassword(newPassword);
+        if (error) {
+            return res.json(
+                {
+                    success: false,
+                    error: error
+                }
+            )
         }
 
         if (rePassword !== newPassword) {
@@ -256,17 +298,57 @@ class AccountController {
             });
         }
 
-        user.resetPassword(email, newPassword, otp).then(result => {
-            res.json(result);
-        }).catch(error => {
-            console.error('An error occurred:', error);
-            res.json({
-                success: false,
-                error: user.message
+        user.resetPassword(email, newPassword, otp)
+            .then((result) => {
+                res.json(result);
+            })
+            .catch((error) => {
+                console.error("An error occurred:", error);
+                res.json({
+                    success: false,
+                    error: user.message,
+                });
             });
-        });
     }
 
+    changePassword(req, res) {
+        const { idUser, curPassword, newPassword, rePassword } = req.body;
+        if (!idUser || !curPassword || !newPassword || !rePassword) {
+            return res.json({
+                success: false,
+                error: "Missing input parameters...",
+            });
+        }
+
+        const error = checkPassword(newPassword);
+        if (error) {
+            return res.json(
+                {
+                    success: false,
+                    error: error
+                }
+            )
+        }
+
+        if (rePassword !== newPassword) {
+            return res.json({
+                success: false,
+                error: "The two passwords are not the same.",
+            });
+        }
+
+        user.updatePassword(idUser, curPassword, newPassword)
+            .then((result) => {
+                res.json(result);
+            })
+            .catch((error) => {
+                console.error("An error occurred:", error);
+                res.json({
+                    success: false,
+                    error: "An error occurred while processing the request.",
+                });
+            });
+    }
 }
 
 module.exports = new AccountController();

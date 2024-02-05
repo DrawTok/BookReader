@@ -27,9 +27,9 @@ class BookController {
             .catch((error) => this.handleError(res, "Please check your network connection and try again."));
     }
 
-    getLastPageReading(req, res){
-        const {idUser, idBook} = req.params;
-        if (!idUser || !idBook) {
+    getLastPageReading(req, res) {
+        const { idUser, idBook } = req.params;
+        if (!idUser) {
             this.handleError(res, "Missing input parameters...");
             return;
         }
@@ -39,23 +39,46 @@ class BookController {
             .catch((error) => this.handleError(res, error.errorMessage));
     }
 
+    getLastBookRead(req, res) {
+        const { idUser } = req.params;
+        if (!idUser) {
+            this.handleError(res, "Missing input parameters...");
+            return;
+        }
+
+        book.getLastBookReading(idUser)
+            .then((result) => res.json(result))
+            .catch((error) => this.handleError(res, error.errorMessage));
+    }
+
     search(req, res) {
         const { bookName, topic } = req.body;
-
 
         book.search(bookName, topic)
             .then((result) => res.json(result))
             .catch((error) => this.handleError(res, "Please check your network connection and try again."));
     }
 
-    updateStatus(req, res){
-        const {idUser, idBook, status } = req.body;
-        if(!idUser || !idBook || !status){
+    updateStatus(req, res) {
+        const { idUser, idBook, status } = req.body;
+        if (!idUser || !idBook || !status) {
             this.handleError(res, "Missing input parameters...");
             return;
         }
 
         book.updateStatus(idUser, idBook, status)
+            .then((result) => res.json(result))
+            .catch((error) => this.handleError(res, error.errorMessage));
+    }
+
+    getBookmark(req, res) {
+        const { idUser, idBook } = req.params;
+        if (!idUser || !idBook) {
+            this.handleError(res, "Missing input parameters...");
+            return;
+        }
+
+        book.getBookmark(idUser, idBook)
             .then((result) => res.json(result))
             .catch((error) => this.handleError(res, error.errorMessage));
     }

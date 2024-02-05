@@ -22,4 +22,12 @@ router.post("/updateStatus/", async (req, res) => {
     await BookController.updateStatus(req, res);
 });
 
+router.get("/getLastBookRead/:idUser", async (req, res) => {
+    await BookController.getLastBookRead(req, res);
+});
+
+router.get("/getBookmark/:idUser/:idBook", async (req, res) => {
+    await BookController.getBookmark(req, res);
+});
+
 module.exports = router;
