@@ -1,8 +1,7 @@
 const nodemailer = require("nodemailer");
 const user = require("../models/User");
 const randomString = require("randomstring");
-const { validateRegistration, validateLogin, checkPassword } = require("../utils/validate");
-const { json } = require("body-parser");
+
 
 const transporter = nodemailer.createTransport({
     host: "mail.openjavascript.info",
@@ -102,60 +101,10 @@ class AccountController {
         }
     }
 
-    updatePassword(req, res) {
-        try {
-            const { idUser, curPassword, newPassword } = req.body;
-
-            if (!idUser || !curPassword || !newPassword) {
-                return res.json({
-                    success: false,
-                    error: "Missing input parameters...",
-                });
-            }
-
-            const error = checkPassword(newPassword);
-            if (error) {
-                return res.json({
-                    success: false,
-                    error: error,
-                });
-            }
-
-            user.updatePassword(idUser, curPassword, newPassword)
-                .then((result) => {
-                    res.json(result);
-                })
-                .catch((error) => {
-                    console.error("An error occurred:", error);
-                    res.json({
-                        success: false,
-                        error: user.message,
-                    });
-                });
-        } catch (error) {
-            console.error("An error occurred:", error);
-            res.json({
-                success: false,
-                error: "An error occurred while processing the request.",
-            });
-        }
-    }
-
     authLogin(req, res) {
         try {
             const { email, password } = req.body;
 
-            if (!email || !password) {
-                return res.json({
-                    success: false,
-                    error: "Missing input parameters...",
-                });
-            }
-
-            const error = validateLogin(email);
-            if (!error.success) {
-                return res.json(error);
-            }
 
             user.authLogin(email, password)
                 .then((result) => {
@@ -259,30 +208,9 @@ class AccountController {
     }
 
     resetPassword(req, res) {
-        const { email, newPassword, otp, rePassword } = req.body;
-        if (!email || !newPassword || !otp || !rePassword) {
-            return res.json({
-                success: false,
-                error: "Missing input parameters...",
-            });
-        }
+        const { email, password, otp, rePassword } = req.body;
 
-        const error = checkPassword(newPassword);
-        if (error) {
-            return res.json({
-                success: false,
-                error: error,
-            });
-        }
-
-        if (rePassword !== newPassword) {
-            return res.json({
-                success: false,
-                error: "The two passwords are not the same.",
-            });
-        }
-
-        user.resetPassword(email, newPassword, otp)
+        user.resetPassword(email, password, otp)
             .then((result) => {
                 res.json(result);
             })
@@ -297,27 +225,6 @@ class AccountController {
 
     changePassword(req, res) {
         const { idUser, curPassword, newPassword, rePassword } = req.body;
-        if (!idUser || !curPassword || !newPassword || !rePassword) {
-            return res.json({
-                success: false,
-                error: "Missing input parameters...",
-            });
-        }
-
-        const error = checkPassword(newPassword);
-        if (error) {
-            return res.json({
-                success: false,
-                error: error,
-            });
-        }
-
-        if (rePassword !== newPassword) {
-            return res.json({
-                success: false,
-                error: "The two passwords are not the same.",
-            });
-        }
 
         user.updatePassword(idUser, curPassword, newPassword)
             .then((result) => {

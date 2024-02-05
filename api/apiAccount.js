@@ -16,15 +16,27 @@ router.post("/registerUser", validate.signup, async (req, res) => {
     await AccountController.registerUser(req, res);
 });
 
-router.post("/updateInfoUser", async (req, res) => {
+router.post("/updateInfoUser", validate.updateInfo, async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.json({ success: false, errors: errors.array()[0].msg });
+    }
     await AccountController.updateInfoUser(req, res);
 });
 
-router.post("/updatePassword", async (req, res) => {
-    await AccountController.updatePassword(req, res);
+router.post("/changePassword", validate.changePassword, async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.json({ success: false, errors: errors.array()[0].msg });
+    }
+    await AccountController.changePassword(req, res);
 });
 
-router.post("/authLogin", async (req, res) => {
+router.post("/authLogin", validate.signin, async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.json({ success: false, errors: errors.array()[0].msg });
+    }
     await AccountController.authLogin(req, res);
 });
 
@@ -36,12 +48,12 @@ router.post("/authOTP", async (req, res) => {
     await AccountController.authOTP(req, res);
 });
 
-router.post("/resetPassword", async (req, res) => {
+router.post("/resetPassword", validate.resetPassword, async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.json({ success: false, errors: errors.array()[0].msg });
+    }
     await AccountController.resetPassword(req, res);
-});
-
-router.post("/changePassword", async (req, res) => {
-    await AccountController.changePassword(req, res);
 });
 
 module.exports = router;
