@@ -1,9 +1,7 @@
 const nodemailer = require("nodemailer");
 const user = require("../models/User");
 const randomString = require("randomstring");
-const { validateRegistration,
-    validateLogin,
-    checkPassword } = require("../utils/validate");
+const { validateRegistration, validateLogin, checkPassword } = require("../utils/validate");
 const { json } = require("body-parser");
 
 const transporter = nodemailer.createTransport({
@@ -21,20 +19,10 @@ class AccountController {
     registerUser(req, res) {
         try {
             const { email, fullName, birthDay, password, rePassword, role } = req.body;
-            if (!email || !fullName | !password || !rePassword) {
-                return res.json({
-                    success: false,
-                    error: "Missing input parameters...",
-                });
-            }
 
             const name = fullName.trim();
             const formattedEmail = email.trim().toLowerCase();
 
-            const error = validateRegistration(name, formattedEmail, password, rePassword);
-            if (!error.success) {
-                return res.json(error);
-            }
             user.createUser(formattedEmail, name, birthDay || new Date(2000, 1, 1), password, role || "user")
                 .then((result) => {
                     res.json(result);
@@ -127,12 +115,10 @@ class AccountController {
 
             const error = checkPassword(newPassword);
             if (error) {
-                return res.json(
-                    {
-                        success: false,
-                        error: error
-                    }
-                )
+                return res.json({
+                    success: false,
+                    error: error,
+                });
             }
 
             user.updatePassword(idUser, curPassword, newPassword)
@@ -206,7 +192,7 @@ class AccountController {
                 charset: "numeric",
             });
 
-            user.insertIntoActiveKey(email, otp).then(result => {
+            user.insertIntoActiveKey(email, otp).then((result) => {
                 if (!result.success) {
                     return res.json({ result });
                 }
@@ -283,12 +269,10 @@ class AccountController {
 
         const error = checkPassword(newPassword);
         if (error) {
-            return res.json(
-                {
-                    success: false,
-                    error: error
-                }
-            )
+            return res.json({
+                success: false,
+                error: error,
+            });
         }
 
         if (rePassword !== newPassword) {
@@ -322,12 +306,10 @@ class AccountController {
 
         const error = checkPassword(newPassword);
         if (error) {
-            return res.json(
-                {
-                    success: false,
-                    error: error
-                }
-            )
+            return res.json({
+                success: false,
+                error: error,
+            });
         }
 
         if (rePassword !== newPassword) {

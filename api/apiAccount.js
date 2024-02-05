@@ -1,12 +1,18 @@
 const express = require("express");
 const router = express.Router();
 const AccountController = require("../controllers/AccountController");
+const validate = require("../utils/validate");
+const { validationResult } = require("express-validator");
 
 router.get("/getInfoUser/:idUser", async (req, res) => {
     await AccountController.getInfoUser(req, res);
 });
 
-router.post("/registerUser", async (req, res) => {
+router.post("/registerUser", validate.signup, async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.json({ success: false, errors: errors.array()[0].msg });
+    }
     await AccountController.registerUser(req, res);
 });
 
