@@ -40,7 +40,7 @@ router.post("/authLogin", validate.signin, async (req, res) => {
     await AccountController.authLogin(req, res);
 });
 
-router.post("/forgotPassword/:email", validate.forgotPassword, async (req, res) => {
+router.post("/forgotPassword/", validate.forgotPassword, async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.json({ success: false, errors: errors.array()[0].msg });
