@@ -204,12 +204,10 @@ class User extends Database {
                 const values = [email, code, curSeconds];
 
                 await connection.query(query, values);
-                console.log("Inserted into active_key successfully");
             } else {
                 query = "UPDATE active_key SET code = ?, time = ? WHERE email = ?";
 
                 await connection.query(query, [code, curSeconds, email]);
-                console.log("Updated active_key successfully");
             }
 
             connection.end();

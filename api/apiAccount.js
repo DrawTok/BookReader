@@ -40,11 +40,20 @@ router.post("/authLogin", validate.signin, async (req, res) => {
     await AccountController.authLogin(req, res);
 });
 
-router.post("/forgotPassword/:email", async (req, res) => {
+router.post("/forgotPassword/:email", validate.forgotPassword, async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.json({ success: false, errors: errors.array()[0].msg });
+    }
+
     await AccountController.forgotPassword(req, res);
 });
 
-router.post("/authOTP", async (req, res) => {
+router.post("/authOTP", validate.authOTP, async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.json({ success: false, errors: errors.array()[0].msg });
+    }
     await AccountController.authOTP(req, res);
 });
 

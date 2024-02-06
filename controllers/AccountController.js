@@ -129,23 +129,18 @@ class AccountController {
     forgotPassword(req, res) {
         try {
             const email = req.params.email;
-            if (!email) {
-                return res.json({
-                    success: false,
-                    error: "Missing input parameters...",
-                });
-            }
 
             const otp = randomString.generate({
                 length: 6,
                 charset: "numeric",
             });
 
-            user.insertIntoActiveKey(email, otp).then((result) => {
-                if (!result.success) {
-                    return res.json({ result });
-                }
-            });
+            // user.insertIntoActiveKey(email, otp).then((result) => {
+            //     if (!result.success) {
+            //         return res.json({ result });
+            //     }
+            // });
+            user.insertIntoActiveKey(email, otp);
 
             const mailOptions = {
                 from: "bookreadertlu3@gmail.com",
@@ -162,7 +157,6 @@ class AccountController {
                         error: "Failed to send OTP email",
                     });
                 } else {
-                    console.log("Email sent: " + info.response);
                     res.json({
                         success: true,
                         message: "OTP sent successfully",
@@ -180,19 +174,6 @@ class AccountController {
 
     authOTP(req, res) {
         const { email, otp } = req.body;
-        if (!email) {
-            return res.json({
-                success: false,
-                error: "Missing input parameters...",
-            });
-        }
-
-        if (!otp) {
-            return res.json({
-                success: false,
-                error: "OTP cannot be blank...",
-            });
-        }
 
         user.authOTP(email, otp)
             .then((result) => {
