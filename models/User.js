@@ -251,9 +251,6 @@ class User extends Database {
                 const hashedPassword = await crypto.createHash("sha256").update(newPassword).digest("hex");
 
                 const [resultUpdatePassword] = await connection.query("UPDATE users SET password = ? WHERE email = ?", [hashedPassword, email]);
-
-                connection.end();
-
                 if (resultUpdatePassword.affectedRows > 0) {
                     this.deleteActiveKey(email);
                     return {

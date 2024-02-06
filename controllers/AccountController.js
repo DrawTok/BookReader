@@ -198,9 +198,9 @@ class AccountController {
     }
 
     resetPassword(req, res) {
-        const { email, password, otp, rePassword } = req.body;
+        const { email, newPassword, otp, rePassword } = req.body;
 
-        user.resetPassword(email, password, otp)
+        user.resetPassword(email, newPassword, otp)
             .then((result) => {
                 res.json(result);
             })
