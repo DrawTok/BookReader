@@ -128,7 +128,7 @@ class AccountController {
 
     forgotPassword(req, res) {
         try {
-            const email = req.params.email;
+            const { email } = req.body;
 
             const otp = randomString.generate({
                 length: 6,
@@ -140,6 +140,15 @@ class AccountController {
             //         return res.json({ result });
             //     }
             // });
+            user.isExistsEmail(email).then(result => {
+                if (!result) {
+                    res.json({
+                        success: false,
+                        error: "Account does not exist"
+                    })
+                }
+            });
+
             user.insertIntoActiveKey(email, otp);
 
             const mailOptions = {
