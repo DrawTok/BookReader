@@ -81,7 +81,10 @@ class AccountController {
                     error: "Missing input parameters...",
                 });
             }
-            user.updateUser(idUser, email, fullName, birthDay, role)
+
+            const name = fullName.trim();
+            
+            user.updateUser(idUser, email, name, birthDay, role)
                 .then((result) => {
                     res.json(result);
                 })
