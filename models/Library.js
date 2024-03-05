@@ -3,7 +3,7 @@ const Database = require("./Database");
 const { getBookDetailById } = require('../utils/utilsFilterMapBook');
 class Library extends Database {
 
-    async saveBookRead(idUser, idBook, status, lastPageReading) {
+    async saveBookRead(idUser, idBook, status, lastPageReading, date) {
         try {
             const connection = await this.connect();
 
@@ -11,8 +11,8 @@ class Library extends Database {
             const [resultReadUID] = await connection.query(queryReadUID, [idUser, idBook]);
 
             if (resultReadUID.length === 0) {
-                const querySaveData = "INSERT INTO `libraries`(idUser, idBook, status, lastPageReading) VALUES (?, ?, ?, 1)";
-                const [insertResults] = await connection.query(querySaveData, [idUser, idBook, status]);
+                const querySaveData = "INSERT INTO `libraries`(idUser, idBook, status, lastPageReading) VALUES (?, ?, ?, ?)";
+                const [insertResults] = await connection.query(querySaveData, [idUser, idBook, status, lastPageReading]);
 
                 if (insertResults.affectedRows > 0) {
                     return {
@@ -27,11 +27,10 @@ class Library extends Database {
                 }
             } else {
                 const oldPage = resultReadUID[0]?.lastPageReading;
-
                 if (oldPage !== lastPageReading) {
-                    const queryUpdatePage = "UPDATE `libraries` SET lastPageReading = ? WHERE idUser = ? AND idBook = ?";
-                    const [updateResults] = await connection.query(queryUpdatePage, [lastPageReading, idUser, idBook]);
-
+                    const queryUpdatePage = "UPDATE `libraries` SET lastPageReading = ?, status = ?, modifiedDate = ? WHERE idUser = ? AND idBook = ?";
+                    const [updateResults] = await connection.query(queryUpdatePage,
+                        [lastPageReading, status, date, idUser, idBook]);
                     if (updateResults.affectedRows > 0) {
                         return {
                             success: true,

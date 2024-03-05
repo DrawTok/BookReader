@@ -141,7 +141,8 @@ class Book extends Database {
     async getLastBookReading(idUser) {
         try {
             const connection = await this.connect();
-            const query = `SELECT * from libraries WHERE idUser = ? AND status = '${IN_PROCESS}' ORDER BY modifiedTime DESC LIMIT 1`;
+            const query = `SELECT * from libraries WHERE idUser = ? AND status = 
+            '${IN_PROCESS}' ORDER BY modifiedTime DESC LIMIT 1`;
             const [results] = await connection.query(query, [idUser]);
             if (results.length > 0) {
                 //get book detail
