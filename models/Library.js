@@ -28,10 +28,10 @@ class Library extends Database {
             } else {
                 const oldPage = resultReadUID[0]?.lastPageReading;
                 var currentTime = new Date();
-                var formattedTime = currentTime.toISOString().slice(0, 19).replace('T', ' ');
-
+                var newTime = new Date(currentTime.getTime() + (7) * 60 * 60 * 1000);
+                var formattedTime = newTime.toISOString().slice(0, 19).replace('T', ' ');
                 if (oldPage !== lastPageReading) {
-                    const queryUpdatePage = "UPDATE `libraries` SET lastPageReading = ?, status = ?, modifiedDate = ? WHERE idUser = ? AND idBook = ?";
+                    const queryUpdatePage = "UPDATE `libraries` SET lastPageReading = ?, status = ?, modifiedTime = ? WHERE idUser = ? AND idBook = ?";
                     const [updateResults] = await connection.query(queryUpdatePage,
                         [lastPageReading, status, formattedTime, idUser, idBook]);
                     if (updateResults.affectedRows > 0) {
