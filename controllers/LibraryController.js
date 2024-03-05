@@ -3,14 +3,14 @@ const library = require("../models/Library");
 class LibraryController {
 
     saveReadingProcess(req, res) {
-        const { idUser, idBook, status, lastPageReading, modifiedDate } = req.body;
+        const { idUser, idBook, status, lastPageReading } = req.body;
 
         if (!idUser || !idBook || !status) {
             this.handleError(res, 'Missing input parameters...');
             return;
         }
 
-        library.saveBookRead(idUser, idBook, status, lastPageReading, modifiedDate).then(result => res.json(result))
+        library.saveBookRead(idUser, idBook, status, lastPageReading).then(result => res.json(result))
             .catch(error => this.handleError
                 (res, 'Please check your network connection and try again.'));
     }
